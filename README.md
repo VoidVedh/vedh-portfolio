@@ -1,19 +1,22 @@
 # Vedh Naik — Personal Developer Portfolio
 
-A clean, high-performance personal developer portfolio built with **vanilla HTML5, CSS3, and JavaScript (ES6+)**.
+A high-performance personal developer portfolio built with **vanilla HTML5, CSS3, and JavaScript (ES6+)**.
 
-Designed around three core pillars:
-1. **GitHub** — Verified featured projects, tech stacks, and architecture details.
-2. **LinkedIn** — Professional identity, education background, and focus areas.
-3. **X / Twitter** — Authentic chronological Dev Log stream detailing active learning and experiments.
-4. **Interactive Terminal Easter Egg** — A memorable hacker-inspired terminal interface for fast technical exploration.
+Designed around authentic technical proof of work, verified projects, and clear engineering capabilities:
+1. **Proof of Work** — Verified hands-on experience across Web Development, Cloud & DevOps, Networking & Security, and Machine Learning.
+2. **Featured Projects** — Detailed technical breakdowns: What I Built, What I Worked With, What I Learned.
+3. **Currently Building** — Active 2026 focus tracks in Machine Learning, Cybersecurity, and Cloud/DevOps.
+4. **Why I Build & How I Build** — Core engineering motivation and systematic 6-step problem-solving sequence.
+5. **Dev Log** — Chronological learning journal detailing ongoing projects and experiments.
+6. **What I Work With** — Categorized technical breadth (Build, Backend, Systems, Cloud, Security, Learning).
+7. **Interactive Terminal Easter Egg** — A developer-friendly terminal interface for rapid exploration.
 
 ---
 
 ## Technical Stack
 
 - **Markup**: Semantic HTML5 with complete ARIA attributes & SEO metadata.
-- **Styling**: Vanilla CSS3 with CSS Custom Properties (Design Tokens), Dark/Light theme support, Glassmorphism, and responsive breakpoints.
+- **Styling**: Vanilla CSS3 with CSS Custom Properties (Design Tokens), Dark/Light theme support, and responsive breakpoints.
 - **Logic**: Vanilla JavaScript (ES6+), zero dependencies, zero build step.
 - **Data Layer**: Centralized data configuration in `data/content.js`.
 
@@ -27,9 +30,9 @@ my_portfolio/
 ├── style.css         # Design system tokens, component styling, dark/light themes
 ├── script.js         # DOM rendering, theme switching, modal, & terminal logic
 ├── data/
-│   └── content.js    # Single source of truth for all content & placeholders
+│   └── content.js    # Single source of truth for all content
 ├── assets/
-│   ├── profile/      # Profile picture storage (defaults to initials avatar)
+│   ├── profile/      # Profile picture storage
 │   └── projects/     # Project screenshots and diagrams
 └── README.md         # Project documentation and developer guide
 ```
@@ -44,20 +47,14 @@ All personal data, projects, skills, education, and links are managed centrally 
 | :--- | :--- |
 | **Profile & Identity** | `SITE_DATA.profile` (name, title, tagline, location, bio, focus areas) |
 | **Contact & Socials** | `SITE_DATA.profile.links` (github, linkedin, resume) and `email` |
-| **Education & Journey** | `SITE_DATA.journey` (chronological academic milestones) |
-| **Featured Projects** | `SITE_DATA.projects` (project name, overview, tech stack, what was built/learned, links) |
+| **Proof of Work** | `SITE_DATA.proofOfWork` (domain, title, badge, tech, description) |
+| **Why I Build** | `SITE_DATA.whyIBuild` (quote, detail) |
+| **Currently Building** | `SITE_DATA.currentlyBuilding` (track, area, year, summary, detail) |
+| **Featured Projects** | `SITE_DATA.projects` (name, overview, tech, built, workedWith, learned, github, demo) |
 | **Dev Log Posts** | `SITE_DATA.activity` (date, content, topic tags) |
-| **Tech Stack** | `SITE_DATA.skills` (categories and list of tools/languages) |
-| **Currently Learning**| `SITE_DATA.learning` (active study topics & key focus areas) |
-
----
-
-## Placeholders & TODO System
-
-Any value containing `TODO` (such as `TODO_ADD_GITHUB_URL` or `TODO_ADD_EMAIL@example.com`) is automatically detected by `script.js`.
-- The interface gracefully disables the button/link (`aria-disabled="true"`).
-- Visually applies an inactive opacity state (`opacity: 0.5; cursor: not-allowed;`).
-- Displays a tooltip indicating that the link is not yet configured, preventing broken dead `#` links.
+| **Tech Breadth** | `SITE_DATA.whatIWorkWith` (category, items) |
+| **How I Build** | `SITE_DATA.howIBuild` (steps, statement) |
+| **Education & Journey** | `SITE_DATA.journey` (chronological academic milestones) |
 
 ---
 
@@ -70,25 +67,24 @@ Visitors can toggle the developer terminal at any time:
 ### Supported Commands:
 - `help` — List all available commands
 - `about` — Display developer bio and focus areas
-- `projects` — Display featured project summaries
-- `skills` — Output categorized technical capabilities
+- `proof` — View verified hands-on Proof of Work
+- `projects` — Display featured project summaries & architectures
+- `stack` / `skills` — Output categorized technical capabilities
+- `learning` / `currently` — View active 2026 technical tracks
+- `why` — Output developer philosophy
+- `how` — Display 6-step engineering learning sequence
 - `activity` — Print recent Dev Log entries
-- `learning` — View in-progress technical subjects
 - `journey` — Show education milestones
 - `contact` — Print contact and profile links
 - `theme [dark|light|toggle]` — Switch portfolio color theme directly from the shell
 - `whoami` — Display visitor role
 - `date` — Show current system time
 - `clear` — Clear the terminal output
-- `exit` — Close the terminal dialog
-
-**Bonus Features**: Command history via <kbd>&uparrow;</kbd> / <kbd>&downarrow;</kbd> arrow keys and auto-completion with <kbd>Tab</kbd>.
+- `exit` — Close the terminal window
 
 ---
 
 ## Running Locally
-
-Since this project has no build step or package dependencies, you can serve it with any static HTTP server:
 
 ```bash
 # Python 3

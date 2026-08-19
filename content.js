@@ -1,13 +1,10 @@
 /**
- * data/content.js
+ * content.js
  * ---------------------------------------------------------------
  * Single source of truth for all portfolio content.
  * 
  * Update your personal information, links, projects, dev log entries,
  * skills, and journey here — without modifying HTML or CSS.
- * 
- * Unset links/info are marked with "TODO" placeholders and are
- * handled gracefully with disabled states in the UI.
  * ---------------------------------------------------------------
  */
 
@@ -22,10 +19,12 @@ const SITE_CONTENT = {
     initials: "VN",
     title: "Computer Science Student · Developer",
     tagline: "Building software, exploring cybersecurity, and learning machine learning.",
+    avatarImage: "assets/profile/vedh.jpg",
     location: "Navi Mumbai / Mumbai, India",
     handle: "@vedhdev",
-    email: "TODO_ADD_EMAIL@example.com", // TODO: replace with real email
+    email: "vedh1440@gmail.com",
     about: "I'm a Computer Science student focused on software development and understanding how computer systems, networks, and algorithms operate under the hood. My active focus spans web applications, cybersecurity fundamentals, cloud infrastructure, and machine learning. I believe in hands-on learning — building systems, analyzing how they communicate, and solving technical challenges directly in code.",
+    statusBadge: "Open to internships & technical opportunities",
     focusAreas: [
       "Software Development",
       "Cybersecurity",
@@ -33,86 +32,238 @@ const SITE_CONTENT = {
       "Cloud / DevOps"
     ],
     links: {
-      github: "TODO_ADD_GITHUB_URL",       // TODO: Add actual GitHub profile URL
+      github: "https://github.com/VoidVedh",
       linkedin: "TODO_ADD_LINKEDIN_URL",   // TODO: Add actual LinkedIn profile URL
       resume: "TODO_ADD_RESUME_FILE.pdf"   // TODO: Add resume file to assets/ and link it here
     }
   },
 
   // ---------------------------------------------------------
-  // EDUCATION / JOURNEY
+  // WHY I BUILD (Personal Philosophy)
   // ---------------------------------------------------------
-  journey: [
+  whyIBuild: {
+    quote: "I like understanding how things work beneath the surface — from the code running an application to the network carrying its data and the infrastructure running the system.",
+    detail: "Whether it's writing a responsive frontend interface, automating cloud infrastructure with Terraform, inspecting TCP packets in Wireshark, or training machine learning models in Python, my goal is always to build real systems, debug edge cases, and understand why things work."
+  },
+
+  // ---------------------------------------------------------
+  // PROOF OF WORK (Verified Hands-On Domains)
+  // ---------------------------------------------------------
+  proofOfWork: [
     {
-      year: "2025 – 2029",
-      title: "B.Tech in Computer Science & Engineering",
-      place: "ITM, Kharghar",
-      detail: "Undergraduate degree in CSE (In Progress)"
+      domain: "Web Development",
+      title: "Building for the web",
+      badge: null,
+      tech: ["HTML5", "CSS3", "JavaScript", "React"],
+      description: "Built responsive web applications and worked with frontend interfaces, component-based development, deployment, and real project workflows."
     },
     {
-      year: "2022 – 2025",
-      title: "Diploma in Computer Engineering",
-      place: "VPM Polytechnic, Thane",
-      detail: "Graduated with 71.94%"
+      domain: "Cloud & DevOps",
+      title: "Working with infrastructure",
+      badge: "Hands-on",
+      tech: ["AWS", "Docker", "Docker Compose", "Terraform", "Jenkins", "Nginx", "Linux"],
+      description: "Worked with EC2, IAM, VPC, containerized services, infrastructure as code, Linux environments, and deployment tooling."
     },
     {
-      year: "2022",
-      title: "Class X — ICSE",
-      place: "Vibgyor High School, Airoli",
-      detail: "Completed with 76.17%"
+      domain: "Networking & Security",
+      title: "Understanding systems underneath",
+      badge: "Lab Exploration",
+      tech: ["Kali Linux", "Nmap", "Wireshark", "WSL", "TCP/IP", "HTTP"],
+      description: "Exploring networking and security by working with Linux environments, network discovery, packet analysis, and protocol behavior."
     },
     {
-      year: "Ongoing",
-      title: "Self-Directed Technical Growth",
-      place: "Hands-on projects & lab experimentation",
-      detail: "Deepening practical skills across systems, networks, cloud tooling, and applied machine learning."
+      domain: "Machine Learning",
+      title: "Learning Machine Learning",
+      badge: "Current Focus",
+      tech: ["Python", "scikit-learn", "Decision Trees", "ML Fundamentals"],
+      description: "Currently building ML fundamentals with Python — focusing on understanding algorithms and how models learn rather than treating libraries as black boxes."
     }
   ],
 
   // ---------------------------------------------------------
-  // CONFIRMED PROJECTS (Featured Repositories)
+  // HOW I BUILD (Developer Learning Philosophy)
+  // ---------------------------------------------------------
+  howIBuild: {
+    steps: [
+      { num: "01", name: "Understand", desc: "Break down the core problem, system architecture, and protocol fundamentals." },
+      { num: "02", name: "Build", desc: "Write clean, modular code and provision real infrastructure." },
+      { num: "03", name: "Break", desc: "Stress test edge cases, network failures, and input boundaries." },
+      { num: "04", name: "Debug", desc: "Analyze error logs, inspect packets, and isolate root causes." },
+      { num: "05", name: "Learn", desc: "Extract the underlying engineering principle behind the fix." },
+      { num: "06", name: "Improve", desc: "Refactor architecture for reliability, speed, and maintainability." }
+    ],
+    statement: "I learn fastest by building things, running into problems, debugging them, and understanding why the solution works."
+  },
+
+  // ---------------------------------------------------------
+  // CURRENTLY BUILDING (2026 Technical Tracks)
+  // ---------------------------------------------------------
+  currentlyBuilding: [
+    {
+      track: "01",
+      area: "Machine Learning",
+      year: "2026",
+      summary: "Learning ML fundamentals with Python and scikit-learn.",
+      detail: "Exploring split criteria (Gini impurity vs entropy) in decision trees, model evaluation metrics, and supervised learning algorithms from first principles."
+    },
+    {
+      track: "02",
+      area: "Cybersecurity",
+      year: "2026",
+      summary: "Exploring Linux, networking, Nmap and Wireshark.",
+      detail: "Analyzing packet captures, TCP 3-way handshakes, HTTP request lifecycles, and network service discovery in WSL and Kali Linux environments."
+    },
+    {
+      track: "03",
+      area: "Cloud / DevOps",
+      year: "2026",
+      summary: "Working with AWS, Docker, Terraform and deployment workflows.",
+      detail: "Building declarative Infrastructure-as-Code setups, containerizing multi-tier applications, and setting up automated Jenkins and Kubernetes pipelines."
+    }
+  ],
+
+  // ---------------------------------------------------------
+  // WHAT I WORK WITH (Clean Technical Breadth)
+  // ---------------------------------------------------------
+  whatIWorkWith: [
+    {
+      category: "BUILD",
+      items: ["Python", "Java", "C++", "JavaScript", "React"]
+    },
+    {
+      category: "BACKEND",
+      items: ["Node.js", "Express", "MongoDB", "MySQL", "Firebase", "Supabase"]
+    },
+    {
+      category: "SYSTEMS",
+      items: ["Linux", "Nginx", "Docker", "Docker Compose"]
+    },
+    {
+      category: "CLOUD",
+      items: ["AWS", "Terraform", "Jenkins"]
+    },
+    {
+      category: "SECURITY",
+      items: ["Kali Linux", "Nmap", "Wireshark", "WSL"]
+    },
+    {
+      category: "LEARNING",
+      items: ["Machine Learning", "scikit-learn"]
+    }
+  ],
+
+  // ---------------------------------------------------------
+  // FEATURED PROJECTS (Technical Depth)
   // ---------------------------------------------------------
   projects: [
     {
-      id: "sportxtreme",
-      name: "SportXtreme Events",
-      description: "A responsive web platform for discovering and showcasing active sports events.",
-      overview: "SportXtreme Events is a responsive front-end web platform designed to showcase sports events in a clear, accessible interface. Developed and deployed to master component-driven front-end architecture, mobile-first responsive styling, and modern version control workflows.",
-      tech: ["React", "HTML5", "CSS3", "JavaScript", "Git", "GitHub"],
+      id: "twincore",
+      name: "TwinCore Platform",
+      description: "Cloud-native industrial digital twin & telemetry analytics infrastructure on AWS.",
+      overview: "A cloud-native DevOps ecosystem simulating live machine configuration profiles and telemetry data, fully provisioned via Terraform IaC on AWS with automated Jenkins CI/CD and K3s Kubernetes orchestration.",
+      tech: ["AWS", "Terraform", "Docker", "Kubernetes (K3s)", "Jenkins", "Python (Flask)", "Nginx", "Linux"],
       built: [
-        "Componentized React UI for browsing sports events seamlessly",
-        "Mobile-first responsive layout with clean media query breakpoints",
-        "Structured state and modular design for event listings"
+        "Declarative Terraform configurations provisioning AWS VPC, subnets, route tables, and EC2 instances",
+        "Automated Jenkins CI/CD pipeline compiling Docker containers and triggering rolling K3s pod restarts",
+        "Flask-based telemetry analytics microservice generating machine temperature, vibration, and RPM metrics",
+        "Slate-dark dashboard served via Nginx reverse proxy with live telemetry polling"
+      ],
+      workedWith: [
+        "Terraform IaC (HCL)",
+        "AWS EC2, VPC, Security Groups, IAM",
+        "Docker multi-stage builds",
+        "Jenkinsfile declarative pipelines",
+        "K3s CTR & Kubernetes manifests"
       ],
       learned: [
-        "Structuring and building production-ready React web applications",
-        "Writing scalable, responsive CSS without layout breakage across viewports",
-        "Git/GitHub branch workflows and static deployment practices"
+        "Structuring automated Infrastructure-as-Code to ensure repeatable cloud deployments",
+        "Managing container lifecycles, artifact compilation, and zero-downtime rolling updates in Kubernetes",
+        "Configuring reverse proxy layers with Nginx and debugging distributed system logs"
+      ],
+      status: "Verified Project",
+      featured: true,
+      github: "https://github.com/VoidVedh/twincore",
+      demo: null
+    },
+    {
+      id: "sportxtreme",
+      name: "SportXtreme Events",
+      description: "Modern sports event discovery, tournament operations, and registration platform.",
+      overview: "A comprehensive event management web platform designed to streamline tournament discovery, participant registrations, and event scheduling with real-time state management and mobile-first responsive architecture.",
+      tech: ["React", "JavaScript", "Supabase", "CSS3", "Vercel", "Git"],
+      built: [
+        "Component-driven event catalog with real-time category filtering and search",
+        "Supabase authentication and database integration for event registrations",
+        "Responsive mobile-first UI with custom CSS design tokens and smooth transitions"
+      ],
+      workedWith: [
+        "React Hooks & Context API",
+        "Supabase PostgreSQL & Row Level Security (RLS)",
+        "RESTful API queries & async state",
+        "Vercel CI/CD deployment"
+      ],
+      learned: [
+        "Designing scalable frontend architectures with clean separation of concerns",
+        "Implementing secure user flows and backend data contracts with Supabase",
+        "Handling edge cases in asynchronous state updates and mobile layout viewports"
       ],
       status: "Deployed",
       featured: true,
-      github: "TODO_ADD_GITHUB_URL_FOR_SPORTXTREME",   // TODO: Add repository URL
-      demo: "TODO_ADD_LIVE_DEMO_URL"                    // TODO: Add live deployment URL
+      github: "https://github.com/VoidVedh/sportxtreme-events",
+      demo: "https://sport-seven-eta.vercel.app"
     },
     {
       id: "networks-lab",
-      name: "Academic Networks & Environment Lab",
-      description: "An academic networking & cybersecurity lab exploring device discovery and packet analysis.",
-      overview: "An academic lab environment focused on core networking protocols, port discovery, and packet inspection. Centered on understanding TCP/IP communication and network behavior in a WSL-based Linux environment.",
-      tech: ["WSL", "Linux", "Nmap", "Wireshark", "Networking Fundamentals"],
+      name: "Academic Networks & Systems Lab",
+      description: "Practical Linux networking, port discovery, and packet analysis lab.",
+      overview: "An academic lab environment focused on inspecting low-level network communications, analyzing protocol headers, and mapping host topologies in Linux and WSL environments.",
+      tech: ["Kali Linux", "WSL", "Nmap", "Wireshark", "TCP/IP", "HTTP"],
       built: [
-        "WSL-based Linux lab environment for network analysis and inspection",
-        "Targeted host and port discovery workflows using Nmap",
-        "HTTP and TCP packet capture and protocol analysis with Wireshark"
+        "Isolated WSL and Linux testing environment for network discovery workflows",
+        "Targeted host mapping and service port identification using Nmap",
+        "Packet capture workflows analyzing TCP three-way handshakes and HTTP payloads in Wireshark"
+      ],
+      workedWith: [
+        "Wireshark packet filters & protocol dissectors",
+        "Nmap SYN scans & service version detection",
+        "Linux socket tooling & curl diagnostics",
+        "TCP/IP protocol stack & HTTP headers"
       ],
       learned: [
-        "Detailed inspection of TCP 3-way handshakes and HTTP request/response lifecycles",
-        "Practical port scanning techniques and network topology mapping",
-        "Fundamental network security concepts underlying defensive and offensive tooling"
+        "Understanding exact packet-level sequences during connection establishment and teardown",
+        "Analyzing unencrypted payload structures and transport-layer flags",
+        "Practical system administration and network diagnostics directly from the Linux terminal"
       ],
-      status: "Academic project",
+      status: "Academic Lab",
       featured: true,
-      github: "TODO_ADD_GITHUB_URL_FOR_NETWORKS_LAB", // TODO: Add repository URL if published
+      github: null,
+      demo: null
+    },
+    {
+      id: "ml-experiments",
+      name: "Applied Machine Learning Experiments",
+      description: "Foundational ML algorithm implementations, data analysis, and model evaluation in Python.",
+      overview: "A collection of hands-on Machine Learning laboratory experiments exploring core algorithms from mathematical principles rather than treating libraries as black boxes.",
+      tech: ["Python", "scikit-learn", "NumPy", "Pandas", "Decision Trees", "Jupyter"],
+      built: [
+        "Laboratory notebooks implementing Decision Trees, regression models, and classification pipelines",
+        "Data preprocessing routines including feature scaling, normalization, and categorical encoding",
+        "Evaluation scripts computing accuracy, precision, recall, confusion matrices, and ROC curves"
+      ],
+      workedWith: [
+        "scikit-learn estimators & model pipelines",
+        "NumPy matrix operations",
+        "Pandas DataFrame transformations",
+        "Matplotlib & Seaborn visualization"
+      ],
+      learned: [
+        "Mathematical intuition behind split criteria (Gini impurity vs entropy) in decision trees",
+        "Techniques for identifying and mitigating model overfitting and high variance",
+        "Structuring repeatable exploratory data analysis and validation workflows"
+      ],
+      status: "Academic Coursework",
+      featured: true,
+      github: "https://github.com/VoidVedh/MachineLearning-College",
       demo: null
     }
   ],
@@ -149,61 +300,34 @@ const SITE_CONTENT = {
   ],
 
   // ---------------------------------------------------------
-  // SKILLS / TECH STACK
+  // EDUCATION / JOURNEY
   // ---------------------------------------------------------
-  skills: [
+  journey: [
     {
-      category: "Programming",
-      items: ["Python", "C++", "Java", "SQL"]
+      year: "2025 – 2029",
+      title: "B.Tech in Computer Science & Engineering",
+      place: "ITM, Kharghar",
+      detail: "Undergraduate degree in CSE (In Progress)"
     },
     {
-      category: "Web Frontend",
-      items: ["HTML5", "CSS3", "JavaScript", "React"]
+      year: "2022 – 2025",
+      title: "Diploma in Computer Engineering",
+      place: "VPM Polytechnic, Thane",
+      detail: "Graduated with 71.94%"
     },
     {
-      category: "Backend & Databases",
-      items: ["Node.js", "Express", "MongoDB", "MySQL", "Firebase", "Supabase"]
+      year: "2022",
+      title: "Class X — ICSE",
+      place: "Vibgyor High School, Airoli",
+      detail: "Completed with 76.17%"
     },
     {
-      category: "Cloud & DevOps",
-      items: ["AWS EC2", "AWS IAM", "AWS VPC", "AWS S3", "Docker", "Docker Compose", "Terraform", "Jenkins", "Nginx", "Linux"]
-    },
-    {
-      category: "Cybersecurity & Networking",
-      items: ["Kali Linux", "Nmap", "Wireshark", "WSL", "Networking Fundamentals"]
-    },
-    {
-      category: "Machine Learning",
-      items: ["Python", "Scikit-learn", "Core Algorithms"]
+      year: "Ongoing",
+      title: "Self-Directed Technical Growth",
+      place: "Hands-on projects & lab experimentation",
+      detail: "Deepening practical skills across systems, networks, cloud tooling, and applied machine learning."
     }
-  ],
-
-  // ---------------------------------------------------------
-  // CURRENTLY LEARNING
-  // ---------------------------------------------------------
-  learning: [
-    {
-      area: "Machine Learning",
-      detail: "Working through supervised learning models and mathematical intuition in Python with Scikit-learn."
-    },
-    {
-      area: "Cybersecurity",
-      detail: "Expanding practical network defense, packet analysis with Wireshark, and Linux environment security."
-    },
-    {
-      area: "Cloud & DevOps",
-      detail: "Container orchestration with Docker Compose, infrastructure as code with Terraform, and AWS configurations."
-    },
-    {
-      area: "Backend Development",
-      detail: "Designing performant REST APIs with Node.js/Express and exploring database schema optimization."
-    }
-  ],
-
-  // ---------------------------------------------------------
-  // DEVELOPMENT ACTIVITY NOTE (Honest disclosure)
-  // ---------------------------------------------------------
-  activityNote: "Visual representation of regular learning and coding activity over the past 20 weeks. Illustrative development rhythm."
+  ]
 };
 
 // Expose on window, globalThis, and export for Node

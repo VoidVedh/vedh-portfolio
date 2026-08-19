@@ -6,8 +6,9 @@
  * - Theme management (Dark/Light mode with persistence)
  * - Mobile responsive navigation
  * - Project details modal dialog with accessible focus management
+ * - Proof of Work, Why I Build, How I Build, and Currently Building sections
+ * - Categorized Tech Breadth ("What I Work With")
  * - Terminal Easter egg with command history, autocomplete & rich output
- * - Illustrative activity heatmap & interactive tooltips
  * ---------------------------------------------------------------
  */
 
@@ -68,6 +69,8 @@
     } else {
       node.setAttribute("href", url);
       node.removeAttribute("aria-disabled");
+      node.removeAttribute("role");
+      node.removeAttribute("title");
       node.style.opacity = "";
       node.style.cursor = "";
     }
@@ -186,7 +189,13 @@
     if (heroTagline && p.tagline) heroTagline.textContent = p.tagline;
     if (heroLocation && p.location) heroLocation.textContent = p.location;
     if (aboutLocation && p.location) aboutLocation.textContent = p.location;
-    if (avatar && p.initials) avatar.textContent = p.initials;
+    if (avatar) {
+      if (p.avatarImage && !isPlaceholder(p.avatarImage)) {
+        avatar.innerHTML = `<img src="${p.avatarImage}" alt="${p.name || 'Vedh Naik'}" class="avatar-img" />`;
+      } else if (p.initials) {
+        avatar.textContent = p.initials;
+      }
+    }
     if (aboutText && p.about) aboutText.textContent = p.about;
     if (footerYear) footerYear.textContent = new Date().getFullYear();
 
@@ -205,7 +214,6 @@
       ["mobile-linkedin-link", links.linkedin, "LinkedIn"],
       ["mobile-resume-link", links.resume, "Resume"],
       ["hero-github-link", links.github, "GitHub"],
-      ["hero-linkedin-link", links.linkedin, "LinkedIn"],
       ["hero-resume-link", links.resume, "Resume"],
       ["contact-github-link", links.github, "GitHub"],
       ["contact-linkedin-link", links.linkedin, "LinkedIn"],
@@ -217,22 +225,30 @@
       wireLink(item[0], item[1], item[2]);
     });
 
-    const emailNode = document.getElementById("contact-email-link");
-    if (emailNode) {
-      if (isPlaceholder(p.email)) {
-        emailNode.setAttribute("href", "#");
-        emailNode.title = "Email not yet configured";
-        emailNode.style.opacity = "0.5";
-        emailNode.style.cursor = "not-allowed";
-        emailNode.addEventListener("click", function (e) { e.preventDefault(); });
-      } else {
-        emailNode.setAttribute("href", `mailto:${p.email}`);
+    // Wire Hero & Contact Email Links
+    const emailLinks = ["contact-email-link", "hero-email-link"];
+    emailLinks.forEach(function (id) {
+      const emailNode = document.getElementById(id);
+      if (emailNode) {
+        if (isPlaceholder(p.email)) {
+          emailNode.setAttribute("href", "#");
+          emailNode.title = "Email not yet configured";
+          emailNode.style.opacity = "0.5";
+          emailNode.style.cursor = "not-allowed";
+          emailNode.addEventListener("click", function (e) { e.preventDefault(); });
+        } else {
+          emailNode.setAttribute("href", `mailto:${p.email}`);
+          emailNode.removeAttribute("aria-disabled");
+          emailNode.removeAttribute("title");
+          emailNode.style.opacity = "";
+          emailNode.style.cursor = "";
+        }
       }
-    }
+    });
   }
 
   /* ---------------------------------------------------------
-     5. FEATURED REPOSITORIES / PROJECTS
+     5. FEATURED REPOSITORIES / PROJECTS (TECHNICAL DEPTH)
      --------------------------------------------------------- */
   const repoIconSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>';
 
@@ -253,16 +269,45 @@
       const name = el("h3", "repo-name", project.name);
       const desc = el("p", "repo-desc", project.description);
 
+      // Stack tags
+      const stackBlock = el("div", "repo-tech-block");
+      stackBlock.appendChild(el("span", "repo-tech-label", "STACK"));
       const tags = el("div", "repo-tags");
       if (Array.isArray(project.tech)) {
         project.tech.forEach(function (t) {
           tags.appendChild(el("span", "tag", t));
         });
       }
+      stackBlock.appendChild(tags);
+
+      // Technical Highlights (Built & Learned)
+      const highlights = el("div", "repo-highlights");
+      
+      if (Array.isArray(project.built) && project.built.length > 0) {
+        const builtBox = el("div", "highlight-box");
+        builtBox.appendChild(el("span", "highlight-title", "WHAT I BUILT"));
+        const ul = el("ul", "highlight-list");
+        project.built.slice(0, 2).forEach(function (b) {
+          ul.appendChild(el("li", null, b));
+        });
+        builtBox.appendChild(ul);
+        highlights.appendChild(builtBox);
+      }
+
+      if (Array.isArray(project.learned) && project.learned.length > 0) {
+        const learnedBox = el("div", "highlight-box");
+        learnedBox.appendChild(el("span", "highlight-title", "WHAT I LEARNED"));
+        const ul = el("ul", "highlight-list");
+        project.learned.slice(0, 2).forEach(function (l) {
+          ul.appendChild(el("li", null, l));
+        });
+        learnedBox.appendChild(ul);
+        highlights.appendChild(learnedBox);
+      }
 
       const footer = el("div", "repo-footer");
 
-      const detailsBtn = el("button", "btn btn-sm", "Details & Architecture");
+      const detailsBtn = el("button", "btn btn-sm", "Architecture & Details");
       detailsBtn.type = "button";
       detailsBtn.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -279,25 +324,16 @@
         footer.appendChild(demoLink);
       }
 
-      const ghLink = el("a", "btn btn-sm", "GitHub");
-      if (isPlaceholder(project.github)) {
-        ghLink.href = "#";
-        ghLink.style.opacity = "0.5";
-        ghLink.style.cursor = "not-allowed";
-        ghLink.title = "GitHub repository not yet published";
-        ghLink.addEventListener("click", function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        });
-      } else {
+      if (!isPlaceholder(project.github)) {
+        const ghLink = el("a", "btn btn-sm", "Source");
         ghLink.href = project.github;
         ghLink.target = "_blank";
         ghLink.rel = "noopener noreferrer";
         ghLink.addEventListener("click", function (e) { e.stopPropagation(); });
+        footer.appendChild(ghLink);
       }
-      footer.appendChild(ghLink);
 
-      card.append(top, name, desc, tags, footer);
+      card.append(top, name, desc, stackBlock, highlights, footer);
 
       card.addEventListener("keydown", function (e) {
         if (e.key === "Enter" && e.target === card) {
@@ -322,11 +358,13 @@
     const modalOverview = document.getElementById("modal-overview");
     const techWrap = document.getElementById("modal-tech");
     const builtList = document.getElementById("modal-built");
+    const workedBlock = document.getElementById("modal-worked-block");
+    const workedList = document.getElementById("modal-worked");
     const learnedList = document.getElementById("modal-learned");
     const linksWrap = document.getElementById("modal-links");
 
     if (modalTitle) modalTitle.textContent = project.name;
-    if (modalStatus) modalStatus.textContent = `Status: ${project.status || "In Progress"}`;
+    if (modalStatus) modalStatus.textContent = `Status: ${project.status || "Verified Project"}`;
     if (modalOverview) modalOverview.textContent = project.overview || project.description;
 
     if (techWrap) {
@@ -347,6 +385,18 @@
       }
     }
 
+    if (workedList) {
+      workedList.innerHTML = "";
+      if (Array.isArray(project.workedWith) && project.workedWith.length > 0) {
+        if (workedBlock) workedBlock.style.display = "block";
+        project.workedWith.forEach(function (item) {
+          workedList.appendChild(el("li", null, item));
+        });
+      } else {
+        if (workedBlock) workedBlock.style.display = "none";
+      }
+    }
+
     if (learnedList) {
       learnedList.innerHTML = "";
       if (Array.isArray(project.learned)) {
@@ -359,7 +409,7 @@
     if (linksWrap) {
       linksWrap.innerHTML = "";
       if (!isPlaceholder(project.github)) {
-        const gh = el("a", "btn btn-sm", "View on GitHub");
+        const gh = el("a", "btn btn-sm", "View Source on GitHub");
         gh.href = project.github;
         gh.target = "_blank";
         gh.rel = "noopener noreferrer";
@@ -414,7 +464,82 @@
   }
 
   /* ---------------------------------------------------------
-     7. DEV LOG (Learning Stream)
+     7. PROOF OF WORK (4 DOMAINS)
+     --------------------------------------------------------- */
+  function renderProofOfWork() {
+    const grid = document.getElementById("proof-grid");
+    if (!grid || !Array.isArray(data.proofOfWork)) return;
+    grid.innerHTML = "";
+
+    data.proofOfWork.forEach(function (cardData) {
+      const card = el("article", "proof-card");
+
+      const top = el("div", "proof-card-top");
+      top.appendChild(el("span", "proof-domain", cardData.domain));
+      if (cardData.badge) {
+        top.appendChild(el("span", "proof-badge", cardData.badge));
+      }
+
+      const title = el("h3", "proof-title", cardData.title);
+      const desc = el("p", "proof-desc", cardData.description);
+
+      const techWrap = el("div", "proof-tech-wrap");
+      if (Array.isArray(cardData.tech)) {
+        cardData.tech.forEach(function (t) {
+          techWrap.appendChild(el("span", "tag", t));
+        });
+      }
+
+      card.append(top, title, desc, techWrap);
+      grid.appendChild(card);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     8. WHY I BUILD
+     --------------------------------------------------------- */
+  function renderWhyIBuild() {
+    const quoteNode = document.getElementById("why-build-quote");
+    const detailNode = document.getElementById("why-build-detail");
+    const w = data.whyIBuild || {};
+
+    if (quoteNode && w.quote) {
+      quoteNode.textContent = `"${w.quote.replace(/^"|"$/g, '')}"`;
+    }
+    if (detailNode && w.detail) {
+      detailNode.textContent = w.detail;
+    }
+  }
+
+  /* ---------------------------------------------------------
+     9. CURRENTLY BUILDING (2026 TRACKS)
+     --------------------------------------------------------- */
+  function renderCurrentlyBuilding() {
+    const grid = document.getElementById("currently-building-grid");
+    if (!grid || !Array.isArray(data.currentlyBuilding)) return;
+    grid.innerHTML = "";
+
+    data.currentlyBuilding.forEach(function (track) {
+      const card = el("div", "track-card");
+
+      const head = el("div", "track-head");
+      const numWrap = el("div", "track-num-wrap");
+      numWrap.appendChild(el("span", "track-num", track.track));
+      numWrap.appendChild(el("h3", "track-area", track.area));
+      head.appendChild(numWrap);
+
+      head.appendChild(el("span", "track-year-badge", track.year || "2026"));
+
+      const summary = el("p", "track-summary", track.summary);
+      const detail = el("p", "track-detail", track.detail);
+
+      card.append(head, summary, detail);
+      grid.appendChild(card);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     10. DEV LOG (Learning Stream)
      --------------------------------------------------------- */
   function renderActivity() {
     const list = document.getElementById("devlog-list");
@@ -452,50 +577,32 @@
   }
 
   /* ---------------------------------------------------------
-     8. SKILLS & TECH STACK
+     11. WHAT I WORK WITH (CLEAN TECHNICAL BREADTH)
      --------------------------------------------------------- */
-  function renderSkills() {
-    const grid = document.getElementById("skills-grid");
-    if (!grid || !Array.isArray(data.skills)) return;
+  function renderTechBreadth() {
+    const grid = document.getElementById("tech-breadth-grid");
+    if (!grid || !Array.isArray(data.whatIWorkWith)) return;
     grid.innerHTML = "";
 
-    data.skills.forEach(function (group) {
-      const card = el("div", "skill-card");
-      card.appendChild(el("h3", null, group.category));
+    data.whatIWorkWith.forEach(function (group) {
+      const card = el("div", "tech-category-card");
 
-      const tagsWrap = el("div", "skill-tags");
+      const label = el("h3", "tech-category-label", group.category);
+      card.appendChild(label);
+
+      const itemsWrap = el("div", "tech-category-items");
       if (Array.isArray(group.items)) {
         group.items.forEach(function (item) {
-          tagsWrap.appendChild(el("span", "tag", item));
+          itemsWrap.appendChild(el("span", "tech-item-chip", item));
         });
       }
-
-      card.appendChild(tagsWrap);
+      card.appendChild(itemsWrap);
       grid.appendChild(card);
     });
   }
 
   /* ---------------------------------------------------------
-     9. CURRENTLY LEARNING
-     --------------------------------------------------------- */
-  function renderLearning() {
-    const grid = document.getElementById("learning-grid");
-    if (!grid || !Array.isArray(data.learning)) return;
-    grid.innerHTML = "";
-
-    data.learning.forEach(function (item) {
-      const card = el("div", "learning-card");
-      const top = el("div", "learning-card-top");
-      top.appendChild(el("span", "pulse-dot"));
-      top.appendChild(el("h3", null, item.area));
-      card.appendChild(top);
-      card.appendChild(el("p", null, item.detail));
-      grid.appendChild(card);
-    });
-  }
-
-  /* ---------------------------------------------------------
-     10. JOURNEY / EDUCATION TIMELINE
+     12. JOURNEY / EDUCATION TIMELINE
      --------------------------------------------------------- */
   function renderJourney() {
     const list = document.getElementById("journey-list");
@@ -515,52 +622,31 @@
   }
 
   /* ---------------------------------------------------------
-     11. DEVELOPMENT ACTIVITY HEATMAP (Illustrative)
+     13. HOW I BUILD (WORKFLOW SEQUENCE)
      --------------------------------------------------------- */
-  function renderActivityGraph() {
-    const graph = document.getElementById("activity-graph");
-    const note = document.getElementById("activity-note");
-    if (!graph) return;
-    graph.innerHTML = "";
+  function renderHowIBuild() {
+    const seqWrap = document.getElementById("how-build-sequence");
+    const statementNode = document.getElementById("how-build-statement");
+    const h = data.howIBuild || {};
 
-    const weeks = 20;
-    const days = 7;
-    let seed = 42;
-    function deterministicRandom() {
-      seed = (seed * 9301 + 49297) % 233280;
-      return seed / 233280;
+    if (seqWrap && Array.isArray(h.steps)) {
+      seqWrap.innerHTML = "";
+      h.steps.forEach(function (step) {
+        const stepCard = el("div", "how-step-card");
+        stepCard.appendChild(el("span", "how-step-num", step.num));
+        stepCard.appendChild(el("h4", "how-step-name", step.name));
+        stepCard.appendChild(el("p", "how-step-desc", step.desc));
+        seqWrap.appendChild(stepCard);
+      });
     }
 
-    for (let w = 0; w < weeks; w++) {
-      for (let d = 0; d < days; d++) {
-        const intensity = deterministicRandom();
-        const cell = el("div", "activity-cell");
-        if (intensity > 0.82) {
-          cell.style.background = "var(--accent)";
-          cell.style.opacity = "1";
-          cell.title = `Active coding session (${intensity.toFixed(2)})`;
-        } else if (intensity > 0.60) {
-          cell.style.background = "var(--accent)";
-          cell.style.opacity = "0.65";
-          cell.title = `Technical reading / lab work`;
-        } else if (intensity > 0.38) {
-          cell.style.background = "var(--accent)";
-          cell.style.opacity = "0.32";
-          cell.title = `Study & exploration`;
-        } else {
-          cell.title = `Rest / planning`;
-        }
-        graph.appendChild(cell);
-      }
-    }
-
-    if (note && data.activityNote) {
-      note.textContent = data.activityNote;
+    if (statementNode && h.statement) {
+      statementNode.textContent = `"${h.statement.replace(/^"|"$/g, '')}"`;
     }
   }
 
   /* ---------------------------------------------------------
-     12. TERMINAL EASTER EGG
+     14. TERMINAL EASTER EGG
      --------------------------------------------------------- */
   function initTerminal() {
     const overlay = document.getElementById("terminal-overlay");
@@ -591,7 +677,7 @@
       body.innerHTML = "";
       printBlock([
         "vedh@portfolio:~$ init --session",
-        "Vedh Jayesh Naik — Developer Terminal v2.0",
+        "Vedh Jayesh Naik — Developer Terminal v3.0",
         "Interactive environment. Type \"help\" to list available commands.",
         "--------------------------------------------------"
       ], "dim");
@@ -599,8 +685,8 @@
     }
 
     const availableCommands = [
-      "help", "about", "projects", "repo", "skills", "activity", 
-      "learning", "journey", "contact", "whoami", "theme", "date", "clear", "exit"
+      "help", "about", "proof", "projects", "stack", "skills", "learning", "currently",
+      "why", "how", "activity", "journey", "contact", "whoami", "theme", "date", "clear", "exit"
     ];
 
     const commandHandlers = {
@@ -609,14 +695,17 @@
           "Available Commands:",
           "",
           "  about      — Display developer biography & identity",
-          "  projects   — List verified featured projects",
-          "  skills     — Display technical skills by category",
+          "  proof      — Show verified hands-on Proof of Work",
+          "  projects   — List verified featured projects & architectures",
+          "  stack      — Display technical breadth (What I Work With)",
+          "  learning   — List active 2026 learning tracks",
+          "  why        — Display core motivation & developer philosophy",
+          "  how        — Display 6-step engineering learning sequence",
           "  activity   — Show recent Dev Log progress entries",
-          "  learning   — List current active exploration areas",
-          "  journey    — Display education & milestones",
-          "  contact    — Display contact and professional profiles",
-          "  theme      — Switch color theme (e.g. \"theme dark\" or \"theme light\")",
-          "  whoami     — View terminal user role",
+          "  journey    — Display education & academic milestones",
+          "  contact    — Display direct contact links (Email, GitHub)",
+          "  theme      — Switch theme (e.g. \"theme dark\" or \"theme light\")",
+          "  whoami     — View terminal session role",
           "  date       — Show current local system time",
           "  clear      — Clear terminal screen",
           "  exit       — Close the terminal window"
@@ -630,6 +719,7 @@
           `Role:     ${p.title}`,
           `Focus:    ${(p.focusAreas || []).join(" · ")}`,
           `Location: ${p.location}`,
+          `Status:   ${p.statusBadge || "Available for internships"}`,
           "",
           `Bio: ${p.about}`
         ]);
@@ -643,26 +733,78 @@
         print(new Date().toString(), "highlight");
       },
 
+      proof: function () {
+        print("");
+        if (Array.isArray(data.proofOfWork)) {
+          data.proofOfWork.forEach(function (card) {
+            print(`[${card.domain}] ${card.title} ${card.badge ? `(${card.badge})` : ''}`, "cmd");
+            print(`  Tech: ${(card.tech || []).join(" · ")}`, "highlight");
+            print(`  ${card.description}`);
+            print("");
+          });
+        }
+      },
+
       projects: function () {
         print("");
         if (Array.isArray(data.projects)) {
           data.projects.forEach(function (p, idx) {
             print(`[${idx + 1}] ${p.name} (${p.status})`, "cmd");
             print(`    Overview: ${p.description}`, "dim");
-            print(`    Tech:     ${(p.tech || []).join(", ")}`, "dim");
+            print(`    Stack:    ${(p.tech || []).join(" · ")}`, "highlight");
+            if (p.github) print(`    Source:   ${p.github}`, "dim");
+            if (p.demo) print(`    Demo:     ${p.demo}`, "dim");
             print("");
           });
         }
       },
 
-      skills: function () {
+      stack: function () {
         print("");
-        if (Array.isArray(data.skills)) {
-          data.skills.forEach(function (g) {
+        if (Array.isArray(data.whatIWorkWith)) {
+          data.whatIWorkWith.forEach(function (g) {
             print(`${g.category}:`, "highlight");
-            print(`  ${(g.items || []).join(", ")}`, "dim");
+            print(`  ${(g.items || []).join(" · ")}`, "dim");
           });
         }
+      },
+
+      skills: function () {
+        commandHandlers.stack();
+      },
+
+      learning: function () {
+        print("");
+        if (Array.isArray(data.currentlyBuilding)) {
+          data.currentlyBuilding.forEach(function (track) {
+            print(`[Track ${track.track}] ${track.area} (${track.year})`, "highlight");
+            print(`  Summary: ${track.summary}`);
+            print(`  Detail:  ${track.detail}`, "dim");
+            print("");
+          });
+        }
+      },
+
+      currently: function () {
+        commandHandlers.learning();
+      },
+
+      why: function () {
+        const w = data.whyIBuild || {};
+        print("");
+        print(`"${w.quote}"`, "highlight");
+        print(`\n${w.detail}`);
+      },
+
+      how: function () {
+        const h = data.howIBuild || {};
+        print("");
+        if (Array.isArray(h.steps)) {
+          h.steps.forEach(function (s) {
+            print(`${s.num} — ${s.name}: ${s.desc}`, "cmd");
+          });
+        }
+        print(`\n"${h.statement}"`, "highlight");
       },
 
       activity: function () {
@@ -675,16 +817,6 @@
               print(`  tags: ${post.tags.map(t => '#' + t).join(" ")}`, "dim");
             }
             print("");
-          });
-        }
-      },
-
-      learning: function () {
-        print("");
-        if (Array.isArray(data.learning)) {
-          data.learning.forEach(function (item) {
-            print(`⚡ ${item.area}:`, "highlight");
-            print(`   ${item.detail}`, "dim");
           });
         }
       },
@@ -703,10 +835,11 @@
         const p = data.profile || {};
         const links = p.links || {};
         printBlock([
-          `Email:    ${isPlaceholder(p.email) ? "Not added yet (TODO in content.js)" : p.email}`,
-          `GitHub:   ${isPlaceholder(links.github) ? "Not configured yet" : links.github}`,
-          `LinkedIn: ${isPlaceholder(links.linkedin) ? "Not configured yet" : links.linkedin}`,
-          `Location: ${p.location}`
+          `Email:    ${p.email}`,
+          `GitHub:   ${links.github}`,
+          `LinkedIn: ${isPlaceholder(links.linkedin) ? "Pending configuration" : links.linkedin}`,
+          `Location: ${p.location}`,
+          `Status:   ${p.statusBadge}`
         ]);
       },
 
@@ -836,7 +969,7 @@
   }
 
   /* ---------------------------------------------------------
-     13. INITIALIZATION
+     15. INITIALIZATION
      --------------------------------------------------------- */
   function init() {
     initTheme();
@@ -844,11 +977,13 @@
     renderProfile();
     renderProjects();
     initModal();
+    renderProofOfWork();
+    renderWhyIBuild();
+    renderCurrentlyBuilding();
     renderActivity();
-    renderSkills();
-    renderLearning();
+    renderTechBreadth();
     renderJourney();
-    renderActivityGraph();
+    renderHowIBuild();
     initTerminal();
   }
 
