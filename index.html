@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vedh Naik — Computer Science Student &amp; Developer</title>
+  <meta name="description" content="Vedh Naik — Computer Science student and developer focusing on software development, cybersecurity, machine learning, and cloud infrastructure. Projects, dev log, and technical skills.">
+  <meta name="author" content="Vedh Jayesh Naik">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Meta -->
+  <meta property="og:title" content="Vedh Naik — Computer Science Student &amp; Developer">
+  <meta property="og:description" content="Building software, exploring cybersecurity, and learning machine learning.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Vedh Naik — Computer Science Student &amp; Developer">
+  <meta name="twitter:description" content="Computer Science student &amp; developer exploring software engineering, cybersecurity, and machine learning.">
+
+  <!-- Favicon (Clean SVG monospace glyph) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0b0d'/><text x='50' y='68' font-size='56' font-family='monospace' font-weight='800' fill='%233ecf8e' text-anchor='middle'>V</text></svg>">
+
+  <!-- Typography: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ============ NAVIGATION ============ -->
+<header class="nav" id="top-nav">
+  <div class="nav-inner">
+    <a href="#home" class="brand" aria-label="Vedh Naik Home">
+      <span class="brand-name">VEDH</span><span class="brand-dot">.DEV</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#activity">Dev Log</a>
+      <a href="#skills">Skills</a>
+      <a href="#learning">Learning</a>
+      <a href="#journey">Journey</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a class="icon-btn desktop-only" id="github-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.43-2.7 5.4-5.27 5.69.42.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A10.51 10.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+      </a>
+      <a class="icon-btn desktop-only" id="linkedin-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27ZM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>
+      </a>
+      <a class="icon-btn desktop-only" id="resume-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="Download Resume">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      </a>
+      <button class="icon-btn terminal-btn" id="terminal-open-btn" aria-label="Open developer terminal (shortcut: `)">
+        <span aria-hidden="true" class="terminal-btn-icon">&gt;_</span>
+        <span class="terminal-btn-label">Terminal</span>
+      </button>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme">
+        <svg id="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg>
+        <svg id="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-drawer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div class="mobile-drawer" id="mobile-drawer" hidden aria-label="Mobile Navigation">
+    <nav class="mobile-nav-links">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#activity">Dev Log</a>
+      <a href="#skills">Skills</a>
+      <a href="#learning">Learning</a>
+      <a href="#journey">Journey</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="mobile-drawer-actions">
+      <a class="btn btn-sm" id="mobile-github-link" href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a class="btn btn-sm" id="mobile-linkedin-link" href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a class="btn btn-sm" id="mobile-resume-link" href="#" target="_blank" rel="noopener noreferrer">Resume</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section id="home" class="hero" aria-label="Introduction">
+    <div class="container hero-grid">
+      <div class="avatar-wrap">
+        <div class="avatar" id="avatar" aria-label="Vedh Naik initials">VN</div>
+        <div class="avatar-badge" title="Active developer">
+          <span class="pulse-dot"></span>
+        </div>
+      </div>
+      <div class="hero-text-content">
+        <div class="hero-kicker-row">
+          <span class="status-pill">
+            <span class="status-dot"></span>Available for internships &amp; collaboration
+          </span>
+          <span class="terminal-shortcut-badge desktop-only" id="hero-term-badge">
+            <span class="key-hint">`</span> opens terminal
+          </span>
+        </div>
+
+        <h1 class="hero-name" id="hero-name">Vedh Naik</h1>
+        <p class="hero-role" id="hero-role">Computer Science Student · Developer</p>
+        <p class="hero-tagline" id="hero-tagline">Building software, exploring cybersecurity, and learning machine learning.</p>
+
+        <!-- Rapid focus chips for instant 5-second recruiter comprehension -->
+        <div class="hero-focus-chips" id="hero-focus-chips" aria-label="Areas of technical focus">
+          <span class="focus-chip">Software Development</span>
+          <span class="focus-chip">Cybersecurity</span>
+          <span class="focus-chip">Machine Learning</span>
+          <span class="focus-chip">Cloud / DevOps</span>
+        </div>
+
+        <p class="hero-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="hero-location">Navi Mumbai / Mumbai, India</span>
+        </p>
+
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-primary">
+            <span>View Projects</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+          <a href="#" id="hero-github-link" class="btn" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.43-2.7 5.4-5.27 5.69.42.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A10.51 10.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+            <span>GitHub</span>
+          </a>
+          <a href="#" id="hero-linkedin-link" class="btn" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27ZM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>
+            <span>LinkedIn</span>
+          </a>
+          <a href="#" id="hero-resume-link" class="btn" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            <span>Resume</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about" class="section" aria-label="About Vedh Naik">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">01 · Profile</span>
+          <h2 class="section-title">About Me</h2>
+        </div>
+      </div>
+      <div class="about-content">
+        <div class="about-main">
+          <p class="about-text" id="about-text"></p>
+          <div class="about-principles">
+            <div class="principle-item">
+              <span class="principle-icon">⚡</span>
+              <div>
+                <strong>Hands-on builder:</strong>
+                <span>Learning systems by building projects from the ground up and inspecting how protocols and runtimes behave.</span>
+              </div>
+            </div>
+            <div class="principle-item">
+              <span class="principle-icon">🔍</span>
+              <div>
+                <strong>Deep technical curiosity:</strong>
+                <span>Exploring cybersecurity fundamentals, Linux internals, cloud architecture, and machine learning models.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="about-facts">
+          <div class="fact">
+            <div class="fact-label">Current Academic Pursuit</div>
+            <div class="fact-value">B.Tech in Computer Science &amp; Engineering</div>
+            <div class="fact-sub">ITM, Kharghar (2025–2029)</div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">Technical Foundation</div>
+            <div class="fact-value">Diploma in Computer Engineering</div>
+            <div class="fact-sub">VPM Polytechnic, Thane · 71.94%</div>
+          </div>
+          <div class="fact">
+            <div class="fact-label">Based in</div>
+            <div class="fact-value" id="about-location">Navi Mumbai / Mumbai, India</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURED REPOSITORIES ============ -->
+  <section id="projects" class="section" aria-label="Featured projects and repositories">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">02 · What I Build</span>
+          <h2 class="section-title">Featured Projects</h2>
+          <p class="section-sub">Verified, hands-on projects showcasing practical engineering — quality over quantity.</p>
+        </div>
+      </div>
+      <div class="repo-grid" id="repo-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ DEV LOG ============ -->
+  <section id="activity" class="section" aria-label="Developer activity log">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">03 · Technical Stream</span>
+          <h2 class="section-title">Dev Log</h2>
+          <p class="section-sub">A chronological learning journal detailing ongoing projects, experiments, and technical takeaways.</p>
+        </div>
+      </div>
+      <div class="devlog-list" id="devlog-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ SKILLS / TECH STACK ============ -->
+  <section id="skills" class="section" aria-label="Technical skills and tools">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">04 · Technical Capabilities</span>
+          <h2 class="section-title">Tech Stack &amp; Skills</h2>
+          <p class="section-sub">An authentic categorised overview of programming languages, frameworks, and engineering tools.</p>
+        </div>
+      </div>
+      <div class="skills-grid" id="skills-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ CURRENTLY LEARNING ============ -->
+  <section id="learning" class="section" aria-label="Current technical learning areas">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">05 · Active Progression</span>
+          <h2 class="section-title">Currently Learning</h2>
+          <p class="section-sub">Active study areas and topics being explored through code, lab experimentation, and reading.</p>
+        </div>
+      </div>
+      <div class="learning-grid" id="learning-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ JOURNEY / EDUCATION ============ -->
+  <section id="journey" class="section" aria-label="Academic and development journey">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">06 · Background</span>
+          <h2 class="section-title">Education &amp; Journey</h2>
+          <p class="section-sub">Academic milestones and progression in computer science and engineering.</p>
+        </div>
+      </div>
+      <div class="journey-list" id="journey-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ DEVELOPMENT ACTIVITY ============ -->
+  <section id="dev-activity" class="section" aria-label="Development activity heatmap">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">07 · Building Rhythm</span>
+          <h2 class="section-title">Development Activity</h2>
+          <p class="section-sub">Illustrative 20-week learning and coding rhythm.</p>
+        </div>
+      </div>
+      <div class="activity-graph-wrap">
+        <div class="activity-graph-header">
+          <span class="activity-graph-title">Activity Rhythm</span>
+          <div class="activity-legend">
+            <span>Less</span>
+            <span class="activity-cell" style="opacity:.25" aria-hidden="true"></span>
+            <span class="activity-cell" style="opacity:.5" aria-hidden="true"></span>
+            <span class="activity-cell" style="opacity:.75" aria-hidden="true"></span>
+            <span class="activity-cell" style="opacity:1;background:var(--accent)" aria-hidden="true"></span>
+            <span>More</span>
+          </div>
+        </div>
+        <div class="activity-graph" id="activity-graph" role="img" aria-label="Learning activity grid, illustrative representation"></div>
+        <p class="activity-note" id="activity-note"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="section contact" aria-label="Contact information">
+    <div class="container">
+      <span class="eyebrow">08 · Get In Touch</span>
+      <h2 class="section-title">Let's Connect</h2>
+      <p class="contact-sub">Open to internships, technical discussions, and opportunities to build alongside ambitious engineering teams.</p>
+      <div class="contact-actions">
+        <a href="#" id="contact-email-link" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span>Email Me</span>
+        </a>
+        <a href="#" id="contact-github-link" class="btn" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.43-2.7 5.4-5.27 5.69.42.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A10.51 10.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+          <span>GitHub</span>
+        </a>
+        <a href="#" id="contact-linkedin-link" class="btn" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27ZM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>
+          <span>LinkedIn</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-copy">
+      <span>&copy; <span id="footer-year">2026</span> Vedh Naik. Built with vanilla HTML, CSS &amp; JavaScript.</span>
+    </div>
+    <div class="footer-links">
+      <a href="#" id="footer-github-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="#" id="footer-linkedin-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="#home" class="footer-back-to-top">
+        <span>Back to top</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ PROJECT DETAIL MODAL ============ -->
+<div class="modal-overlay" id="project-modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal" tabindex="-1">
+    <div class="modal-top">
+      <div>
+        <h3 class="modal-title" id="modal-title"></h3>
+        <p class="modal-status" id="modal-status"></p>
+      </div>
+      <button class="modal-close" id="modal-close-btn" aria-label="Close project details dialog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-scroll-body">
+      <div class="modal-block">
+        <h4>Overview</h4>
+        <p id="modal-overview"></p>
+      </div>
+      <div class="modal-block">
+        <h4>Technologies Used</h4>
+        <div class="repo-tags" id="modal-tech"></div>
+      </div>
+      <div class="modal-block">
+        <h4>What I Built</h4>
+        <ul id="modal-built"></ul>
+      </div>
+      <div class="modal-block">
+        <h4>Key Technical Takeaways</h4>
+        <ul id="modal-learned"></ul>
+      </div>
+    </div>
+
+    <div class="modal-links" id="modal-links"></div>
+  </div>
+</div>
+
+<!-- ============ TERMINAL EASTER EGG ============ -->
+<div class="terminal-overlay" id="terminal-overlay" hidden role="dialog" aria-modal="true" aria-label="Interactive Developer Terminal">
+  <div class="terminal-window" tabindex="-1">
+    <div class="terminal-titlebar">
+      <div class="terminal-dots" aria-hidden="true">
+        <span class="dot dot-red" id="term-dot-close" title="Close"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+      </div>
+      <span class="terminal-title">vedh@portfolio: ~ (bash)</span>
+      <button class="terminal-close-btn" id="terminal-close-btn" aria-label="Close terminal window">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="terminal-body" id="terminal-body" role="log" aria-live="polite"></div>
+    <div class="terminal-input-row">
+      <label for="terminal-input" class="visually-hidden">Terminal command input</label>
+      <span class="terminal-prompt" aria-hidden="true">vedh@portfolio:~$</span>
+      <input type="text" id="terminal-input" class="terminal-input" autocomplete="off" spellcheck="false" aria-label="Terminal command input" placeholder="Type a command (e.g. help, projects, skills)...">
+    </div>
+  </div>
+</div>
+
+<!-- Fallback content if data/content.js or content.js is loaded -->
+<script src="data/content.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
