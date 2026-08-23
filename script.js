@@ -1184,9 +1184,9 @@
     let hasBooted = false;
 
     const availableCommands = [
-      "help", "about", "proof", "projects", "blueprint", "stack",
+      "help", "about", "neofetch", "specs", "proof", "projects", "blueprint", "stack",
       "tracks", "focus", "devlog", "skills", "journey", "theme",
-      "whoami", "contact", "clear", "exit", "matrix", "sudo", "quote"
+      "whoami", "contact", "clear", "exit", "matrix", "sudo", "quote", "uname"
     ];
 
     function printLine(text, cssClass) {
@@ -1313,17 +1313,44 @@
         case "help":
           printLine("Available commands:", "term-highlight");
           printLine("  about         - Background, profile & academic pursuit");
+          printLine("  neofetch      - System specs, toolchain & architecture summary");
           printLine("  projects      - List authentic personal projects & coursework");
           printLine("  proof [id]    - Open deep-dive modal for a project (e.g. proof twincore)");
           printLine("  blueprint     - View interactive 4-domain technical architecture");
           printLine("  stack         - View categorized languages, systems & tools");
           printLine("  tracks        - 2026 active development tracks (Currently Building)");
           printLine("  devlog        - Chronological technical journal stream");
+          printLine("  journey       - Academic journey & milestone timeline");
           printLine("  theme [mode]  - Switch theme ('theme dark', 'theme light', or 'theme')");
           printLine("  whoami        - CS candidate identity & system credentials");
           printLine("  contact       - Direct contact email & verified profiles");
           printLine("  clear         - Clear terminal display buffer");
           printLine("  exit          - Close interactive shell");
+          break;
+
+        case "neofetch":
+        case "specs":
+          printLine("       /\\        vedh@portfolio-v2", "term-highlight");
+          printLine("      /  \\       -----------------", "term-muted");
+          printLine("     / /\\ \\      OS      : VEDH-OS v2.6.4 x86_64", "term-success");
+          printLine("    / /__\\ \\     Host    : ITM CSE / Poly Foundation", "term-primary");
+          printLine("   / /____\\ \\    Kernel  : Linux 6.8.0-generic / POSIX", "term-muted");
+          printLine("  /_/      \\_\\   Uptime  : 2022 - 2026 (Active)", "term-muted");
+          printLine("                 Shell   : bash 5.2.26", "term-muted");
+          printLine("                 Stack   : AWS, Terraform, Docker, Python, JS ES6+", "term-highlight");
+          printLine("                 Terminal: CRT Phosphor VT100", "term-muted");
+          printLine("                 Theme   : Obsidian Zinc [dark] / Studio Paper [light]", "term-muted");
+          break;
+
+        case "uname":
+          printLine("Linux vedh-workstation 6.8.0-40-generic #40-Ubuntu SMP x86_64 GNU/Linux", "term-success");
+          break;
+
+        case "journey":
+          printLine("Academic Journey & Progression:", "term-highlight");
+          (data.journey || []).forEach(j => {
+            printLine(`  [${j.year}] ${j.title} @ ${j.place} (${j.detail})`);
+          });
           break;
 
         case "about":
