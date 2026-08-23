@@ -1,460 +1,638 @@
 /**
  * script.js
  * ---------------------------------------------------------------
- * Vanilla JavaScript (ES6+). Zero external libraries or frameworks.
- * Renders data from data/content.js and powers interactivity:
- * - Theme management (Dark/Light mode with persistence)
- * - Mobile responsive navigation
- * - Project details modal dialog with accessible focus management
- * - Proof of Work, Why I Build, How I Build, and Currently Building sections
- * - Categorized Tech Breadth ("What I Work With")
- * - Terminal Easter egg with command history, autocomplete & rich output
+ * Vedh Naik — Personal Developer Profile & Portfolio
+ * Agency-Grade Engineering Portfolio & Case Study Showcase:
+ * - Dynamic data population from data/content.js (Single Source of Truth)
+ * - Large editorial case study blocks for Proof of Work
+ * - Smooth category filter transitions & inline collapsible breakdowns
+ * - Interactive Engineering Blueprint with 60fps Particle Topology Canvas
+ * - Retro-OS Boot Energy Terminal Easter Egg (boot sequence, CRT styling, history, tab-completion)
+ * - Scrollspy & Top Reading Progress Bar
+ * - IntersectionObserver scroll-reveal animations
+ * - Accessible focus management (WCAG AA) & Dark/Light theme engine
  * ---------------------------------------------------------------
  */
 
 (function () {
   "use strict";
 
-  // Robust data retrieval from data/content.js
-  function getSiteData() {
-    if (typeof window !== "undefined" && window.SITE_DATA) return window.SITE_DATA;
-    if (typeof globalThis !== "undefined" && globalThis.SITE_DATA) return globalThis.SITE_DATA;
-    if (typeof SITE_DATA !== "undefined") return SITE_DATA;
-    if (typeof SITE_CONTENT !== "undefined") return SITE_CONTENT;
-    return {};
-  }
-
-  const data = getSiteData();
-
   /* ---------------------------------------------------------
-     1. DOM UTILITIES & HELPERS
+     1. DATA ACCESS & UTILITIES
      --------------------------------------------------------- */
-  function el(tag, className, html) {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (html !== undefined && html !== null) {
-      if (typeof html === "string") {
-        node.innerHTML = html;
-      } else if (html instanceof Node) {
-        node.appendChild(html);
+  const data = (typeof window !== "undefined" && window.SITE_DATA) ? window.SITE_DATA : {};
+
+  /** Helper: Create element with class and text/HTML */
+  function el(tag, className, content) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (content !== undefined && content !== null) {
+      if (typeof content === "string" && (content.includes("<") || content.includes("&"))) {
+        element.innerHTML = content;
+      } else {
+        element.textContent = content;
       }
     }
-    return node;
+    return element;
   }
 
-  function isPlaceholder(value) {
-    if (!value) return true;
-    const str = String(value).trim();
-    return str.startsWith("TODO") || str.includes("TODO_ADD_") || str === "#";
+  /** Helper: Check for placeholder URL */
+  function isPlaceholder(url) {
+    if (!url || typeof url !== "string") return true;
+    const clean = url.trim();
+    return clean === "" ||
+      clean === "#" ||
+      clean.startsWith("TODO_") ||
+      clean.includes("example.com") ||
+      clean === "null";
   }
 
-  /**
-   * Safely configures an anchor element:
-   * If URL is a TODO placeholder, disables it visually & semantically with a tooltip.
-   */
-  function wireLink(elementId, url, label) {
-    const node = document.getElementById(elementId);
-    if (!node) return;
-
-    if (isPlaceholder(url)) {
-      node.setAttribute("href", "#");
-      node.setAttribute("aria-disabled", "true");
-      node.setAttribute("role", "link");
-      node.title = `${label || "Link"} not yet configured`;
-      node.style.opacity = "0.5";
-      node.style.cursor = "not-allowed";
-      node.addEventListener("click", function (e) {
-        e.preventDefault();
-      });
-    } else {
-      node.setAttribute("href", url);
-      node.removeAttribute("aria-disabled");
-      node.removeAttribute("role");
-      node.removeAttribute("title");
-      node.style.opacity = "";
-      node.style.cursor = "";
+  /** Category SVG Icons */
+  function getCategorySVG(categorySlug) {
+    switch (categorySlug) {
+      case "cloud-devops":
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>';
+      case "machine-learning":
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>';
+      case "systems-security":
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+      case "web-development":
+      default:
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>';
     }
   }
 
-  function formatDate(iso) {
-    if (!iso) return "";
-    const d = new Date(iso + "T00:00:00");
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  }
-
   /* ---------------------------------------------------------
-     2. THEME ENGINE (DARK / LIGHT)
+     2. THEME ENGINE (DARK / LIGHT WITH SMOOTH CROSS-FADE)
      --------------------------------------------------------- */
   function initTheme() {
-    let theme = "dark";
-    try {
-      const stored = localStorage.getItem("portfolio-theme");
-      if (stored) theme = stored;
-    } catch (e) {}
-
-    setTheme(theme);
-
+    const root = document.documentElement;
     const toggleBtn = document.getElementById("theme-toggle");
+    const iconDark = document.getElementById("theme-icon-dark");
+    const iconLight = document.getElementById("theme-icon-light");
+
+    const savedTheme = localStorage.getItem("vedh_theme");
+    const systemPrefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
+
+    applyTheme(initialTheme);
+
     if (toggleBtn) {
       toggleBtn.addEventListener("click", function () {
-        const current = document.documentElement.getAttribute("data-theme") || "dark";
-        const next = current === "dark" ? "light" : "dark";
-        setTheme(next);
+        const currentTheme = root.getAttribute("data-theme") || "dark";
+        const nextTheme = currentTheme === "dark" ? "light" : "dark";
+        applyTheme(nextTheme);
+        localStorage.setItem("vedh_theme", nextTheme);
+      });
+    }
+
+    function applyTheme(theme) {
+      root.setAttribute("data-theme", theme);
+      if (iconDark && iconLight) {
+        if (theme === "dark") {
+          iconDark.style.display = "block";
+          iconLight.style.display = "none";
+        } else {
+          iconDark.style.display = "none";
+          iconLight.style.display = "block";
+        }
+      }
+    }
+
+    // Expose for terminal command
+    window.setSiteTheme = applyTheme;
+  }
+
+  /* ---------------------------------------------------------
+     3. SCROLL PROGRESS & SCROLLSPY
+     --------------------------------------------------------- */
+  function initScrollTracking() {
+    const progressBar = document.getElementById("scroll-progress");
+    const navLinks = document.querySelectorAll("#primary-nav .nav-link");
+    const sectionIds = ["about", "proof", "blueprint", "why-i-build", "currently-building", "activity", "skills", "journey", "contact"];
+    const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+    // 1. Reading Progress Bar
+    window.addEventListener("scroll", function () {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = totalHeight > 0 ? (scrollY / totalHeight) * 100 : 0;
+      if (progressBar) {
+        progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+      }
+    }, { passive: true });
+
+    // 2. Nav Scrollspy via IntersectionObserver
+    if ("IntersectionObserver" in window && sections.length > 0) {
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            const currentId = entry.target.getAttribute("id");
+            navLinks.forEach(function (link) {
+              const href = link.getAttribute("href");
+              if (href === `#${currentId}`) {
+                link.classList.add("active");
+                link.setAttribute("aria-current", "location");
+              } else {
+                link.classList.remove("active");
+                link.removeAttribute("aria-current");
+              }
+            });
+          }
+        });
+      }, {
+        rootMargin: "-20% 0px -65% 0px",
+        threshold: 0.05
+      });
+
+      sections.forEach(function (sec) {
+        observer.observe(sec);
       });
     }
   }
 
-  function setTheme(theme) {
-    const finalTheme = theme === "light" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", finalTheme);
-    try {
-      localStorage.setItem("portfolio-theme", finalTheme);
-    } catch (e) {}
-    updateThemeIcon(finalTheme);
-  }
-
-  function updateThemeIcon(theme) {
-    const darkIcon = document.getElementById("theme-icon-dark");
-    const lightIcon = document.getElementById("theme-icon-light");
-    if (!darkIcon || !lightIcon) return;
-
-    if (theme === "dark") {
-      darkIcon.style.display = "block";
-      lightIcon.style.display = "none";
-    } else {
-      darkIcon.style.display = "none";
-      lightIcon.style.display = "block";
-    }
-  }
-
   /* ---------------------------------------------------------
-     3. MOBILE NAVIGATION DRAWER
+     4. NAVIGATION DRAWER (MOBILE)
      --------------------------------------------------------- */
-  function initMobileNav() {
-    const toggle = document.getElementById("nav-toggle");
+  function initNavigation() {
+    const toggleBtn = document.getElementById("nav-toggle");
     const drawer = document.getElementById("mobile-drawer");
-    if (!toggle || !drawer) return;
+    if (!toggleBtn || !drawer) return;
 
-    function close() {
-      drawer.hidden = true;
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", "Open menu");
-      document.body.style.overflow = "";
-    }
-
-    function open() {
-      drawer.hidden = false;
-      toggle.setAttribute("aria-expanded", "true");
-      toggle.setAttribute("aria-label", "Close menu");
-    }
-
-    toggle.addEventListener("click", function () {
-      if (drawer.hidden) {
-        open();
-      } else {
-        close();
-      }
+    toggleBtn.addEventListener("click", function () {
+      const isExpanded = toggleBtn.getAttribute("aria-expanded") === "true";
+      toggleBtn.setAttribute("aria-expanded", String(!isExpanded));
+      drawer.hidden = isExpanded;
     });
 
-    drawer.querySelectorAll("a").forEach(function (link) {
-      link.addEventListener("click", close);
-    });
-
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && !drawer.hidden) {
-        close();
-        toggle.focus();
-      }
+    const links = drawer.querySelectorAll("a");
+    links.forEach(function (link) {
+      link.addEventListener("click", function () {
+        toggleBtn.setAttribute("aria-expanded", "false");
+        drawer.hidden = true;
+      });
     });
   }
 
   /* ---------------------------------------------------------
-     4. PROFILE & IDENTITY RENDERING
+     5. PROFILE & IDENTITY POPULATION
      --------------------------------------------------------- */
   function renderProfile() {
     const p = data.profile || {};
 
-    const heroName = document.getElementById("hero-name");
-    const heroRole = document.getElementById("hero-role");
-    const heroTagline = document.getElementById("hero-tagline");
-    const heroLocation = document.getElementById("hero-location");
-    const aboutLocation = document.getElementById("about-location");
-    const avatar = document.getElementById("avatar");
-    const aboutText = document.getElementById("about-text");
-    const footerYear = document.getElementById("footer-year");
+    const nameNode = document.getElementById("hero-name");
+    const roleNode = document.getElementById("hero-role");
+    const taglineNode = document.getElementById("hero-tagline");
+    const locNode = document.getElementById("hero-location");
+    const aboutLocNode = document.getElementById("about-location");
+    const aboutTextNode = document.getElementById("about-text");
 
-    if (heroName && p.name) heroName.textContent = p.name;
-    if (heroRole && p.title) heroRole.textContent = p.title;
-    if (heroTagline && p.tagline) heroTagline.textContent = p.tagline;
-    if (heroLocation && p.location) heroLocation.textContent = p.location;
-    if (aboutLocation && p.location) aboutLocation.textContent = p.location;
-    if (avatar) {
-      if (p.avatarImage && !isPlaceholder(p.avatarImage)) {
-        avatar.innerHTML = `<img src="${p.avatarImage}" alt="${p.name || 'Vedh Naik'}" class="avatar-img" />`;
-      } else if (p.initials) {
-        avatar.textContent = p.initials;
-      }
-    }
-    if (aboutText && p.about) aboutText.textContent = p.about;
-    if (footerYear) footerYear.textContent = new Date().getFullYear();
+    if (nameNode && p.name) nameNode.textContent = p.name;
+    if (roleNode && p.title) roleNode.textContent = p.title;
+    if (taglineNode && p.tagline) taglineNode.textContent = p.tagline;
+    if (locNode && p.location) locNode.textContent = p.location;
+    if (aboutLocNode && p.location) aboutLocNode.textContent = p.location;
+    if (aboutTextNode && p.about) aboutTextNode.textContent = p.about;
 
-    if (p.name && p.title) {
-      document.title = `${p.name} — ${p.title}`;
+    // Contact Links
+    const emailLink = document.getElementById("contact-email-link");
+    const heroEmailLink = document.getElementById("hero-email-link");
+    if (p.email) {
+      const mailto = `mailto:${p.email}`;
+      if (emailLink) emailLink.href = mailto;
+      if (heroEmailLink) heroEmailLink.href = mailto;
     }
 
-    const links = p.links || {};
+    const ghLink = document.getElementById("github-link");
+    const heroGh = document.getElementById("hero-github-link");
+    const contactGh = document.getElementById("contact-github-link");
+    const footerGh = document.getElementById("footer-github-link");
+    const mobileGh = document.getElementById("mobile-github-link");
 
-    // Wire all standard navigation & profile links
-    const linkMap = [
-      ["github-link", links.github, "GitHub"],
-      ["linkedin-link", links.linkedin, "LinkedIn"],
-      ["resume-link", links.resume, "Resume"],
-      ["mobile-github-link", links.github, "GitHub"],
-      ["mobile-linkedin-link", links.linkedin, "LinkedIn"],
-      ["mobile-resume-link", links.resume, "Resume"],
-      ["hero-github-link", links.github, "GitHub"],
-      ["hero-resume-link", links.resume, "Resume"],
-      ["contact-github-link", links.github, "GitHub"],
-      ["contact-linkedin-link", links.linkedin, "LinkedIn"],
-      ["footer-github-link", links.github, "GitHub"],
-      ["footer-linkedin-link", links.linkedin, "LinkedIn"]
+    if (p.links && p.links.github) {
+      [ghLink, heroGh, contactGh, footerGh, mobileGh].forEach(function (node) {
+        if (node) node.href = p.links.github;
+      });
+    }
+
+    const lnLinks = [
+      document.getElementById("linkedin-link"),
+      document.getElementById("contact-linkedin-link"),
+      document.getElementById("footer-linkedin-link"),
+      document.getElementById("mobile-linkedin-link")
     ];
 
-    linkMap.forEach(function (item) {
-      wireLink(item[0], item[1], item[2]);
-    });
-
-    // Wire Hero & Contact Email Links
-    const emailLinks = ["contact-email-link", "hero-email-link"];
-    emailLinks.forEach(function (id) {
-      const emailNode = document.getElementById(id);
-      if (emailNode) {
-        if (isPlaceholder(p.email)) {
-          emailNode.setAttribute("href", "#");
-          emailNode.title = "Email not yet configured";
-          emailNode.style.opacity = "0.5";
-          emailNode.style.cursor = "not-allowed";
-          emailNode.addEventListener("click", function (e) { e.preventDefault(); });
-        } else {
-          emailNode.setAttribute("href", `mailto:${p.email}`);
-          emailNode.removeAttribute("aria-disabled");
-          emailNode.removeAttribute("title");
-          emailNode.style.opacity = "";
-          emailNode.style.cursor = "";
+    if (p.links && !isPlaceholder(p.links.linkedin)) {
+      lnLinks.forEach(function (node) {
+        if (node) node.href = p.links.linkedin;
+      });
+    } else {
+      lnLinks.forEach(function (node) {
+        if (node) {
+          node.setAttribute("aria-disabled", "true");
+          node.title = "LinkedIn profile pending";
+          node.addEventListener("click", function (e) { e.preventDefault(); });
         }
-      }
-    });
+      });
+    }
+
+    const resLinks = [
+      document.getElementById("resume-link"),
+      document.getElementById("hero-resume-link"),
+      document.getElementById("mobile-resume-link")
+    ];
+
+    if (p.links && !isPlaceholder(p.links.resume)) {
+      resLinks.forEach(function (node) {
+        if (node) node.href = p.links.resume;
+      });
+    }
   }
 
   /* ---------------------------------------------------------
-     5. FEATURED REPOSITORIES / PROJECTS (TECHNICAL DEPTH)
+     6. PROOF OF WORK (LARGE EDITORIAL CASE STUDY BLOCKS)
      --------------------------------------------------------- */
-  const repoIconSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>';
+  let activeProofCategory = "all";
 
-  function renderProjects() {
-    const grid = document.getElementById("repo-grid");
+  function renderProofOfWork(categoryFilter) {
+    const grid = document.getElementById("proof-grid");
     if (!grid || !Array.isArray(data.projects)) return;
+
+    activeProofCategory = categoryFilter || activeProofCategory || "all";
     grid.innerHTML = "";
 
-    data.projects.forEach(function (project) {
-      const card = el("article", "repo-card");
+    const filtered = activeProofCategory === "all"
+      ? data.projects
+      : data.projects.filter(p => p.categorySlug === activeProofCategory);
+
+    filtered.forEach(function (project, index) {
+      const card = el("article", "project-case-study reveal-item");
       card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "region");
+      card.setAttribute("aria-label", `${project.title || project.name} Case Study`);
+      card.dataset.projectId = project.id;
 
-      const top = el("div", "repo-card-top");
-      const icon = el("div", "repo-icon", repoIconSVG);
-      const status = el("span", "repo-status", project.status || "Project");
-      top.append(icon, status);
+      // --------------------------------------------------
+      // A. TECHNICAL VISUAL PREVIEW PANE (Left Column)
+      // --------------------------------------------------
+      const visualPane = el("div", "project-visual-pane");
+      const gridTexture = el("div", "visual-grid-texture");
+      const radialGlow = el("div", "visual-radial-glow");
 
-      const name = el("h3", "repo-name", project.name);
-      const desc = el("p", "repo-desc", project.description);
+      // Top Tag Bar
+      const topBar = el("div", "visual-top-bar");
+      const systemTag = el("span", "visual-system-tag", (project.underTheHood && project.underTheHood.systemType) || project.category || "Technical Case Study");
+      const statusTag = el("span", "visual-status-tag", `<span class="status-dot-emerald"></span>${project.status || "Verified Project"}`);
+      topBar.append(systemTag, statusTag);
 
-      // Stack tags
-      const stackBlock = el("div", "repo-tech-block");
-      stackBlock.appendChild(el("span", "repo-tech-label", "STACK"));
-      const tags = el("div", "repo-tags");
-      if (Array.isArray(project.tech)) {
-        project.tech.forEach(function (t) {
-          tags.appendChild(el("span", "tag", t));
-        });
-      }
-      stackBlock.appendChild(tags);
+      // Center Diagram Box
+      const diagramBox = el("div", "visual-diagram-box");
+      const iconOrb = el("div", "diagram-icon-orb", getCategorySVG(project.categorySlug));
+      const flowHint = el("span", "diagram-flow-hint", `${(project.tech || []).slice(0, 3).join(" · ")} Architecture`);
+      diagramBox.append(iconOrb, flowHint);
 
-      // Technical Highlights (Built & Learned)
-      const highlights = el("div", "repo-highlights");
-      
-      if (Array.isArray(project.built) && project.built.length > 0) {
-        const builtBox = el("div", "highlight-box");
-        builtBox.appendChild(el("span", "highlight-title", "WHAT I BUILT"));
-        const ul = el("ul", "highlight-list");
-        project.built.slice(0, 2).forEach(function (b) {
-          ul.appendChild(el("li", null, b));
-        });
-        builtBox.appendChild(ul);
-        highlights.appendChild(builtBox);
-      }
+      // Bottom Bar
+      const bottomBar = el("div", "visual-bottom-bar");
+      bottomBar.innerHTML = `<span>VERIFIED SYSTEM FLOW</span><span>0${index + 1} / 0${filtered.length}</span>`;
 
-      if (Array.isArray(project.learned) && project.learned.length > 0) {
-        const learnedBox = el("div", "highlight-box");
-        learnedBox.appendChild(el("span", "highlight-title", "WHAT I LEARNED"));
-        const ul = el("ul", "highlight-list");
-        project.learned.slice(0, 2).forEach(function (l) {
-          ul.appendChild(el("li", null, l));
-        });
-        learnedBox.appendChild(ul);
-        highlights.appendChild(learnedBox);
-      }
+      visualPane.append(gridTexture, radialGlow, topBar, diagramBox, bottomBar);
 
-      const footer = el("div", "repo-footer");
+      // --------------------------------------------------
+      // B. EDITORIAL CASE STUDY CONTENT PANE (Right Column)
+      // --------------------------------------------------
+      const contentPane = el("div", "project-content-pane");
 
-      const detailsBtn = el("button", "btn btn-sm", "Architecture & Details");
-      detailsBtn.type = "button";
-      detailsBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        openProjectModal(project, detailsBtn);
+      const eyebrow = el("div", "case-study-eyebrow", `${project.category} · CASE STUDY 0${index + 1}`);
+      const title = el("h3", "case-study-title", project.title || project.name);
+
+      // Problem Statement / Impact Quote
+      const problemText = project.explanation && project.explanation.problem
+        ? project.explanation.problem
+        : (project.description || project.overview);
+      const problemQuote = el("blockquote", "case-study-problem-quote", `"${problemText}"`);
+
+      // Proof / Verification Tags
+      const proofTagsWrap = el("div", "proof-tags-list");
+      const tagsToDisplay = Array.isArray(project.proofTags) && project.proofTags.length > 0
+        ? project.proofTags
+        : (Array.isArray(project.tech) ? project.tech.slice(0, 4) : []);
+
+      tagsToDisplay.forEach(function (t) {
+        proofTagsWrap.appendChild(el("span", "proof-tag-chip", t));
       });
-      footer.appendChild(detailsBtn);
 
-      if (!isPlaceholder(project.demo)) {
-        const demoLink = el("a", "btn btn-sm btn-primary", "Live Demo");
-        demoLink.href = project.demo;
-        demoLink.target = "_blank";
-        demoLink.rel = "noopener noreferrer";
-        demoLink.addEventListener("click", function (e) { e.stopPropagation(); });
-        footer.appendChild(demoLink);
+      // Tech Stack Badges
+      const techBadgesWrap = el("div", "tech-badges-list");
+      if (Array.isArray(project.tech)) {
+        project.tech.slice(0, 6).forEach(function (t) {
+          techBadgesWrap.appendChild(el("span", "tech-badge-item", t));
+        });
       }
 
-      if (!isPlaceholder(project.github)) {
-        const ghLink = el("a", "btn btn-sm", "Source");
-        ghLink.href = project.github;
+      // Action Buttons
+      const actions = el("div", "case-study-actions");
+
+      const explainBtn = el("button", "btn btn-primary", '<span>Explain Project</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>');
+      explainBtn.type = "button";
+      explainBtn.setAttribute("aria-label", `Explain ${project.title || project.name} architecture`);
+      explainBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        openProjectModal(project, explainBtn, "explain");
+      });
+
+      const hoodBtn = el("button", "btn btn-hood", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4"/></svg><span>Under the Hood</span>');
+      hoodBtn.type = "button";
+      hoodBtn.setAttribute("aria-label", `View Under the Hood flow for ${project.title || project.name}`);
+      hoodBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        openProjectModal(project, hoodBtn, "hood");
+      });
+
+      actions.append(explainBtn, hoodBtn);
+
+      if (!isPlaceholder(project.github || project.sourceUrl)) {
+        const ghLink = el("a", "btn btn-sm", '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.43-2.7 5.4-5.27 5.69.42.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A10.51 10.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg><span>Source</span>');
+        ghLink.href = project.github || project.sourceUrl;
         ghLink.target = "_blank";
         ghLink.rel = "noopener noreferrer";
         ghLink.addEventListener("click", function (e) { e.stopPropagation(); });
-        footer.appendChild(ghLink);
+        actions.appendChild(ghLink);
       }
 
-      card.append(top, name, desc, stackBlock, highlights, footer);
+      if (!isPlaceholder(project.demo || project.liveUrl)) {
+        const demoLink = el("a", "btn btn-sm btn-blueprint-cta", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>Live Demo</span>');
+        demoLink.href = project.demo || project.liveUrl;
+        demoLink.target = "_blank";
+        demoLink.rel = "noopener noreferrer";
+        demoLink.addEventListener("click", function (e) { e.stopPropagation(); });
+        actions.appendChild(demoLink);
+      }
 
-      card.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" && e.target === card) {
-          openProjectModal(project, card);
-        }
+      // Inline Collapsible Breakdown
+      const expandToggle = el("button", "inline-expand-toggle", '<span>Quick Architecture Breakdown</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>');
+      expandToggle.setAttribute("aria-expanded", "false");
+
+      const breakdownDrawer = el("div", "inline-breakdown-drawer");
+      breakdownDrawer.hidden = true;
+
+      // Built
+      if (Array.isArray(project.built) && project.built.length > 0) {
+        const bTitle = el("div", "breakdown-section-title", "What I Built");
+        const bList = el("ul", "breakdown-list");
+        project.built.slice(0, 2).forEach(item => bList.appendChild(el("li", null, item)));
+        breakdownDrawer.append(bTitle, bList);
+      }
+
+      // Learned
+      if (Array.isArray(project.learned) && project.learned.length > 0) {
+        const lTitle = el("div", "breakdown-section-title", "Technical Takeaway");
+        const lList = el("ul", "breakdown-list");
+        project.learned.slice(0, 2).forEach(item => lList.appendChild(el("li", null, item)));
+        breakdownDrawer.append(lTitle, lList);
+      }
+
+      expandToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        const isOpen = expandToggle.getAttribute("aria-expanded") === "true";
+        expandToggle.setAttribute("aria-expanded", String(!isOpen));
+        breakdownDrawer.hidden = isOpen;
       });
 
+      contentPane.append(eyebrow, title, problemQuote, proofTagsWrap, techBadgesWrap, actions, expandToggle, breakdownDrawer);
+
+      card.append(visualPane, contentPane);
       grid.appendChild(card);
+
+      // Trigger scroll reveal
+      setTimeout(() => card.classList.add("is-revealed"), 50 * index);
+    });
+  }
+
+  function initProofFilters() {
+    const buttons = document.querySelectorAll(".proof-filter-btn");
+    if (!buttons || buttons.length === 0) return;
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const category = btn.dataset.category || "all";
+        buttons.forEach(function (b) {
+          b.classList.toggle("active", b === btn);
+          b.setAttribute("aria-selected", String(b === btn));
+        });
+
+        // Smooth transition
+        const grid = document.getElementById("proof-grid");
+        if (grid) {
+          grid.style.opacity = "0";
+          grid.style.transform = "translateY(8px)";
+          setTimeout(function () {
+            renderProofOfWork(category);
+            grid.style.transition = "opacity 240ms ease, transform 240ms ease";
+            grid.style.opacity = "1";
+            grid.style.transform = "translateY(0)";
+          }, 140);
+        }
+      });
     });
   }
 
   /* ---------------------------------------------------------
-     6. PROJECT MODAL DIALOG
+     7. MODAL LOGIC (EXPLAIN & UNDER THE HOOD)
      --------------------------------------------------------- */
-  let previousActiveElement = null;
+  let lastFocusedElement = null;
 
-  function openProjectModal(project, triggerElement) {
-    previousActiveElement = triggerElement || document.activeElement;
+  function switchModalTab(tabName) {
+    const tabExplain = document.getElementById("modal-tab-explain");
+    const tabHood = document.getElementById("modal-tab-hood");
+    const tabOverview = document.getElementById("modal-tab-overview");
 
-    const modalTitle = document.getElementById("modal-title");
-    const modalStatus = document.getElementById("modal-status");
-    const modalOverview = document.getElementById("modal-overview");
-    const techWrap = document.getElementById("modal-tech");
+    const paneExplain = document.getElementById("pane-explain");
+    const paneHood = document.getElementById("pane-hood");
+    const paneOverview = document.getElementById("pane-overview");
+
+    const tabs = [
+      { name: "explain", btn: tabExplain, pane: paneExplain },
+      { name: "hood", btn: tabHood, pane: paneHood },
+      { name: "overview", btn: tabOverview, pane: paneOverview }
+    ];
+
+    tabs.forEach(function (item) {
+      if (!item.btn || !item.pane) return;
+      const isActive = item.name === tabName;
+      item.btn.classList.toggle("active", isActive);
+      item.btn.setAttribute("aria-selected", String(isActive));
+      item.pane.hidden = !isActive;
+      item.pane.classList.toggle("active", isActive);
+    });
+  }
+
+  function openProjectModal(project, triggerElement, initialTab) {
+    if (!project) return;
+    lastFocusedElement = triggerElement || document.activeElement;
+
+    const overlay = document.getElementById("project-modal");
+    if (!overlay) return;
+
+    // Header Info
+    const titleNode = document.getElementById("modal-title");
+    const sysTypeNode = document.getElementById("modal-system-type");
+    const statusNode = document.getElementById("modal-status");
+
+    if (titleNode) titleNode.textContent = project.title || project.name;
+    if (sysTypeNode) sysTypeNode.textContent = (project.underTheHood && project.underTheHood.systemType) || project.category || "Engineering Project";
+    if (statusNode) statusNode.textContent = `· ${project.status || "Personal Project"}`;
+
+    // 1. Tab Explain (6-part breakdown)
+    const explainGrid = document.getElementById("modal-explain-grid");
+    if (explainGrid) {
+      explainGrid.innerHTML = "";
+      const exp = project.explanation || {};
+      const explainSections = [
+        { label: "01 · The Problem", title: "Problem Statement", text: exp.problem || project.description },
+        { label: "02 · The Approach", title: "Architecture Strategy", text: exp.approach || "Structured around declarative system models." },
+        { label: "03 · Implementation", title: "Core Execution", text: exp.implementation || project.overview },
+        { label: "04 · Technology Choices", title: "Why These Tools", text: exp.technology || (project.tech ? `Utilized ${project.tech.join(", ")} for robust modularity.` : "") },
+        { label: "05 · Edge Case / Challenge", title: "Engineering Hurdle", text: exp.challenge || "Debugging inter-service latency and boundary constraints." },
+        { label: "06 · Key Learning", title: "Technical Takeaway", text: exp.learning || (Array.isArray(project.learned) ? project.learned.join(" ") : "System architecture principles.") }
+      ];
+
+      explainSections.forEach(function (sec) {
+        if (!sec.text) return;
+        const item = el("div", "explain-item-card");
+        item.appendChild(el("span", "explain-step-label", sec.label));
+        item.appendChild(el("h4", "explain-item-title", sec.title));
+        item.appendChild(el("p", "explain-item-body", sec.text));
+        explainGrid.appendChild(item);
+      });
+    }
+
+    // 2. Tab Under The Hood
+    const archFlow = document.getElementById("modal-arch-flow");
+    const hoodSummary = document.getElementById("modal-hood-summary");
+    const hoodTakeaways = document.getElementById("modal-hood-takeaways");
+    const hood = project.underTheHood || {};
+
+    if (archFlow) {
+      archFlow.innerHTML = "";
+      if (Array.isArray(hood.architectureFlow) && hood.architectureFlow.length > 0) {
+        hood.architectureFlow.forEach(function (step, sIdx) {
+          const row = el("div", "arch-step-row");
+          const num = el("span", "arch-step-num", step.step || `0${sIdx + 1}`);
+          const content = el("div");
+          content.appendChild(el("div", "arch-step-label", step.label));
+          if (step.sub) content.appendChild(el("div", "arch-step-sub", step.sub));
+          if (step.desc) content.appendChild(el("p", "arch-step-desc", step.desc));
+          row.append(num, content);
+          archFlow.appendChild(row);
+        });
+      } else {
+        archFlow.innerHTML = '<p class="text-secondary" style="font-size: 13px;">Architecture flow verified via primary source repository.</p>';
+      }
+    }
+
+    if (hoodSummary) hoodSummary.textContent = hood.whatBuiltSummary || project.description || "";
+
+    if (hoodTakeaways) {
+      hoodTakeaways.innerHTML = "";
+      const takeaways = Array.isArray(hood.keyTakeaways) ? hood.keyTakeaways : (project.learned || []);
+      takeaways.forEach(function (t) {
+        hoodTakeaways.appendChild(el("li", null, t));
+      });
+    }
+
+    // 3. Tab Overview
+    const overviewText = document.getElementById("modal-overview");
+    const techTags = document.getElementById("modal-tech");
     const builtList = document.getElementById("modal-built");
-    const workedBlock = document.getElementById("modal-worked-block");
     const workedList = document.getElementById("modal-worked");
     const learnedList = document.getElementById("modal-learned");
-    const linksWrap = document.getElementById("modal-links");
 
-    if (modalTitle) modalTitle.textContent = project.name;
-    if (modalStatus) modalStatus.textContent = `Status: ${project.status || "Verified Project"}`;
-    if (modalOverview) modalOverview.textContent = project.overview || project.description;
+    if (overviewText) overviewText.textContent = project.overview || project.description || "";
 
-    if (techWrap) {
-      techWrap.innerHTML = "";
+    if (techTags) {
+      techTags.innerHTML = "";
       if (Array.isArray(project.tech)) {
-        project.tech.forEach(function (t) {
-          techWrap.appendChild(el("span", "tag", t));
-        });
+        project.tech.forEach(t => techTags.appendChild(el("span", "tech-badge-item", t)));
       }
     }
 
     if (builtList) {
       builtList.innerHTML = "";
       if (Array.isArray(project.built)) {
-        project.built.forEach(function (item) {
-          builtList.appendChild(el("li", null, item));
-        });
+        project.built.forEach(item => builtList.appendChild(el("li", null, item)));
       }
     }
 
     if (workedList) {
       workedList.innerHTML = "";
-      if (Array.isArray(project.workedWith) && project.workedWith.length > 0) {
-        if (workedBlock) workedBlock.style.display = "block";
-        project.workedWith.forEach(function (item) {
-          workedList.appendChild(el("li", null, item));
-        });
-      } else {
-        if (workedBlock) workedBlock.style.display = "none";
+      if (Array.isArray(project.workedWith)) {
+        project.workedWith.forEach(item => workedList.appendChild(el("li", null, item)));
       }
     }
 
     if (learnedList) {
       learnedList.innerHTML = "";
       if (Array.isArray(project.learned)) {
-        project.learned.forEach(function (item) {
-          learnedList.appendChild(el("li", null, item));
-        });
+        project.learned.forEach(item => learnedList.appendChild(el("li", null, item)));
       }
     }
 
-    if (linksWrap) {
-      linksWrap.innerHTML = "";
-      if (!isPlaceholder(project.github)) {
-        const gh = el("a", "btn btn-sm", "View Source on GitHub");
-        gh.href = project.github;
-        gh.target = "_blank";
-        gh.rel = "noopener noreferrer";
-        linksWrap.appendChild(gh);
+    // Action Links Footer
+    const linksContainer = document.getElementById("modal-links");
+    if (linksContainer) {
+      linksContainer.innerHTML = "";
+      if (!isPlaceholder(project.github || project.sourceUrl)) {
+        const ghA = el("a", "btn btn-sm", '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.29-1.69-1.29-1.69-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.43-2.7 5.4-5.27 5.69.42.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A10.51 10.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg><span>GitHub Source</span>');
+        ghA.href = project.github || project.sourceUrl;
+        ghA.target = "_blank";
+        ghA.rel = "noopener noreferrer";
+        linksContainer.appendChild(ghA);
       }
-      if (!isPlaceholder(project.demo)) {
-        const demo = el("a", "btn btn-sm btn-primary", "Live Deployment");
-        demo.href = project.demo;
-        demo.target = "_blank";
-        demo.rel = "noopener noreferrer";
-        linksWrap.appendChild(demo);
+      if (!isPlaceholder(project.demo || project.liveUrl)) {
+        const demoA = el("a", "btn btn-sm btn-primary", '<span>Live Demo</span>');
+        demoA.href = project.demo || project.liveUrl;
+        demoA.target = "_blank";
+        demoA.rel = "noopener noreferrer";
+        linksContainer.appendChild(demoA);
       }
     }
 
-    const overlay = document.getElementById("project-modal");
-    if (overlay) {
-      overlay.hidden = false;
-      document.body.style.overflow = "hidden";
-      const closeBtn = document.getElementById("modal-close-btn");
-      if (closeBtn) {
-        setTimeout(function () { closeBtn.focus(); }, 30);
-      }
+    switchModalTab(initialTab || "explain");
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+
+    const closeBtn = document.getElementById("modal-close-btn");
+    if (closeBtn) {
+      setTimeout(() => closeBtn.focus(), 40);
     }
   }
 
   function closeProjectModal() {
     const overlay = document.getElementById("project-modal");
-    if (overlay) {
-      overlay.hidden = true;
-      document.body.style.overflow = "";
-      if (previousActiveElement && typeof previousActiveElement.focus === "function") {
-        previousActiveElement.focus();
-      }
+    if (!overlay || overlay.hidden) return;
+    overlay.hidden = true;
+    document.body.style.overflow = "";
+    if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+      lastFocusedElement.focus();
     }
   }
 
   function initModal() {
-    const closeBtn = document.getElementById("modal-close-btn");
     const overlay = document.getElementById("project-modal");
+    const closeBtn = document.getElementById("modal-close-btn");
+    const tabExplain = document.getElementById("modal-tab-explain");
+    const tabHood = document.getElementById("modal-tab-hood");
+    const tabOverview = document.getElementById("modal-tab-overview");
+
     if (closeBtn) closeBtn.addEventListener("click", closeProjectModal);
     if (overlay) {
       overlay.addEventListener("click", function (e) {
         if (e.target === overlay) closeProjectModal();
       });
     }
+    if (tabExplain) tabExplain.addEventListener("click", () => switchModalTab("explain"));
+    if (tabHood) tabHood.addEventListener("click", () => switchModalTab("hood"));
+    if (tabOverview) tabOverview.addEventListener("click", () => switchModalTab("overview"));
 
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && overlay && !overlay.hidden) {
@@ -464,468 +642,644 @@
   }
 
   /* ---------------------------------------------------------
-     7. PROOF OF WORK (4 DOMAINS)
+     8. ENGINEERING BLUEPRINT & TOPOLOGY PARTICLES
      --------------------------------------------------------- */
-  function renderProofOfWork() {
-    const grid = document.getElementById("proof-grid");
-    if (!grid || !Array.isArray(data.proofOfWork)) return;
-    grid.innerHTML = "";
+  let activeDomainKey = "all";
+  let isTraceMode = false;
+  let activeTraceId = null;
 
-    data.proofOfWork.forEach(function (cardData) {
-      const card = el("article", "proof-card");
+  const domainIconSVGs = {
+    code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>',
+    cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>'
+  };
 
-      const top = el("div", "proof-card-top");
-      top.appendChild(el("span", "proof-domain", cardData.domain));
-      if (cardData.badge) {
-        top.appendChild(el("span", "proof-badge", cardData.badge));
+  /** Lightweight 60fps Particle Topology Canvas */
+  function initBlueprintParticles() {
+    const canvas = document.getElementById("blueprint-particle-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
+
+    const particles = [];
+    const count = Math.min(32, Math.floor((width * height) / 18000));
+
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        radius: Math.random() * 2 + 1.2
+      });
+    }
+
+    function resize() {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    }
+
+    window.addEventListener("resize", resize, { passive: true });
+
+    let animationId;
+    function render() {
+      ctx.clearRect(0, 0, width, height);
+
+      const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+      const nodeColor = isDark ? "rgba(16, 185, 129, 0.4)" : "rgba(5, 150, 105, 0.35)";
+      const lineColor = isDark ? "rgba(6, 182, 212, 0.12)" : "rgba(2, 132, 199, 0.08)";
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = nodeColor;
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 130) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 1 - dist / 130;
+            ctx.stroke();
+          }
+        }
       }
 
-      const title = el("h3", "proof-title", cardData.title);
-      const desc = el("p", "proof-desc", cardData.description);
+      animationId = requestAnimationFrame(render);
+    }
 
-      const techWrap = el("div", "proof-tech-wrap");
-      if (Array.isArray(cardData.tech)) {
-        cardData.tech.forEach(function (t) {
-          techWrap.appendChild(el("span", "tag", t));
+    // Only run when in viewport to conserve battery
+    if ("IntersectionObserver" in window) {
+      const obs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          if (!animationId) render();
+        } else {
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+          }
+        }
+      });
+      obs.observe(canvas);
+    } else {
+      render();
+    }
+  }
+
+  function renderBlueprint() {
+    const bp = data.blueprint;
+    if (!bp || !bp.domains) return;
+
+    const domainsGrid = document.getElementById("blueprint-domains-grid");
+    if (!domainsGrid) return;
+    domainsGrid.innerHTML = "";
+
+    const domainKeys = Object.keys(bp.domains);
+
+    domainKeys.forEach(function (key) {
+      const domain = bp.domains[key];
+      const card = el("div", `domain-node-card ${domain.learningStatus ? 'learning-domain' : ''}`);
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", `${domain.name} domain details`);
+      card.dataset.domainKey = key;
+
+      if (activeDomainKey === key) card.classList.add("active");
+
+      const head = el("div", "domain-node-head");
+      const titleWrap = el("div", "domain-node-title-wrap");
+      const icon = el("div", "domain-node-icon", domainIconSVGs[domain.icon] || domainIconSVGs.code);
+      const title = el("h3", "domain-node-title", domain.name);
+      titleWrap.append(icon, title);
+
+      const badge = el("span", `domain-badge ${domain.learningStatus ? 'learning' : ''}`, domain.badge);
+      head.append(titleWrap, badge);
+
+      const summary = el("p", "domain-node-summary", domain.summary);
+
+      const chipsWrap = el("div", "domain-tech-chips");
+      if (Array.isArray(domain.technologies)) {
+        domain.technologies.slice(0, 5).forEach(function (t) {
+          chipsWrap.appendChild(el("span", "tech-node-chip", `${t.name} (${t.state})`));
+        });
+        if (domain.technologies.length > 5) {
+          chipsWrap.appendChild(el("span", "tech-node-chip", `+${domain.technologies.length - 5} more`));
+        }
+      }
+
+      const footer = el("div", "domain-connection-footer");
+      footer.innerHTML = `<span>Inspect Branch Details</span><span>→</span>`;
+
+      card.append(head, summary, chipsWrap, footer);
+
+      card.addEventListener("click", () => selectBlueprintDomain(key));
+      card.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectBlueprintDomain(key);
+        }
+      });
+
+      domainsGrid.appendChild(card);
+    });
+
+    renderInspector();
+  }
+
+  function selectBlueprintDomain(domainKey) {
+    activeDomainKey = domainKey;
+
+    const tabs = document.querySelectorAll(".domain-tab");
+    tabs.forEach(function (tab) {
+      const match = tab.dataset.domain === domainKey;
+      tab.classList.toggle("active", match);
+      tab.setAttribute("aria-selected", String(match));
+    });
+
+    const cards = document.querySelectorAll(".domain-node-card");
+    cards.forEach(function (card) {
+      if (domainKey === "all" || card.dataset.domainKey === domainKey) {
+        card.classList.toggle("active", domainKey !== "all");
+      } else {
+        card.classList.remove("active");
+      }
+    });
+
+    renderInspector();
+  }
+
+  function renderInspector() {
+    const inspector = document.getElementById("blueprint-inspector");
+    if (!inspector) return;
+
+    const bp = data.blueprint;
+    if (!bp || !bp.domains) return;
+
+    if (activeDomainKey === "all") {
+      inspector.innerHTML = `
+        <div class="inspector-header">
+          <div>
+            <h4 class="inspector-title">Full Engineering Topology Overview</h4>
+            <p class="inspector-sub">Select any branch above to inspect authentic technologies, verified relationship pipelines, and connected projects.</p>
+          </div>
+          <button class="btn btn-sm btn-primary" id="btn-explore-featured" type="button">View Proof of Work ↓</button>
+        </div>
+        <div class="inspector-body-grid">
+          <div class="inspector-block">
+            <span class="inspector-block-title">4 CORE TECHNICAL DOMAINS</span>
+            <div class="flow-diagram-container">
+              <div class="flow-step-item">
+                <span class="flow-node-badge">DEVELOPMENT</span>
+                <span class="flow-rel-badge"><span class="flow-arrow-icon">→</span> HTML5, CSS3, JavaScript → Personal Developer Portfolio</span>
+              </div>
+              <div class="flow-step-item">
+                <span class="flow-node-badge">CYBERSECURITY</span>
+                <span class="flow-rel-badge"><span class="flow-arrow-icon">→</span> Linux, Wireshark, Nmap → Networks &amp; Systems Lab</span>
+              </div>
+              <div class="flow-step-item">
+                <span class="flow-node-badge">CLOUD / DEVOPS</span>
+                <span class="flow-rel-badge"><span class="flow-arrow-icon">→</span> AWS, Terraform, Docker, K3s → TwinCore Platform</span>
+              </div>
+              <div class="flow-step-item">
+                <span class="flow-node-badge">MACHINE LEARNING</span>
+                <span class="flow-rel-badge"><span class="flow-arrow-icon">→</span> Python, scikit-learn, Trees → ML Experiments</span>
+              </div>
+            </div>
+          </div>
+          <div class="inspector-block">
+            <span class="inspector-block-title">AUTHENTIC ARCHITECTURE PRINCIPLE</span>
+            <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.65;">
+              Every domain in this blueprint traces verified hands-on work from foundational primitives to running deployments. Rather than treating libraries as black boxes, the blueprint captures how systems are constructed from the ground up.
+            </p>
+          </div>
+        </div>
+      `;
+
+      const expBtn = document.getElementById("btn-explore-featured");
+      if (expBtn) {
+        expBtn.addEventListener("click", function () {
+          const pSec = document.getElementById("proof");
+          if (pSec) pSec.scrollIntoView({ behavior: "smooth" });
         });
       }
+      return;
+    }
 
-      card.append(top, title, desc, techWrap);
-      grid.appendChild(card);
+    const domain = bp.domains[activeDomainKey];
+    if (!domain) return;
+
+    inspector.innerHTML = "";
+
+    const header = el("div", "inspector-header");
+    const titleCol = el("div");
+    const title = el("h4", "inspector-title", `<span>${domain.name} Branch</span> <span class="domain-badge ${domain.learningStatus ? 'learning' : ''}">${domain.badge}</span>`);
+    const sub = el("p", "inspector-sub", domain.summary);
+    titleCol.append(title, sub);
+    header.appendChild(titleCol);
+
+    const grid = el("div", "inspector-body-grid");
+
+    // Tech Block
+    const techBlock = el("div", "inspector-block");
+    techBlock.appendChild(el("span", "inspector-block-title", `VERIFIED TECHNOLOGIES (${domain.technologies.length})`));
+    const techList = el("div", "inspector-tech-list");
+
+    domain.technologies.forEach(function (tech) {
+      const card = el("div", "tech-detail-card");
+      const head = el("div", "tech-detail-head");
+      head.appendChild(el("strong", "tech-detail-name", tech.name));
+      head.appendChild(el("span", `state-badge state-${tech.state.toLowerCase()}`, tech.state));
+      card.append(head, el("p", "tech-detail-role", tech.role));
+      techList.appendChild(card);
+    });
+    techBlock.appendChild(techList);
+
+    // Flow & Connected Projects Block
+    const flowBlock = el("div", "inspector-block");
+    flowBlock.appendChild(el("span", "inspector-block-title", "VERIFIED RELATIONSHIP FLOW"));
+
+    const flowContainer = el("div", "flow-diagram-container");
+    if (Array.isArray(domain.connections)) {
+      domain.connections.forEach(function (conn) {
+        const item = el("div", "flow-step-item");
+        item.innerHTML = `
+          <span class="flow-node-badge">${conn.from}</span>
+          <span class="flow-rel-badge"><span class="flow-arrow-icon">→</span> ${conn.relation}</span>
+          <span class="flow-node-badge" style="color: var(--accent); margin-left: auto;">${conn.to}</span>
+        `;
+        flowContainer.appendChild(item);
+      });
+    }
+    flowBlock.appendChild(flowContainer);
+
+    if (Array.isArray(domain.projectIds) && domain.projectIds.length > 0) {
+      flowBlock.appendChild(el("span", "inspector-block-title", "CONNECTED IMPLEMENTATION"));
+      domain.projectIds.forEach(function (projId) {
+        const targetProj = (data.projects || []).find(p => p.id === projId);
+        if (targetProj) {
+          const projCard = el("div", "inspector-project-link-card");
+          const info = el("div");
+          info.appendChild(el("div", "project-link-name", targetProj.title || targetProj.name));
+          info.appendChild(el("div", "project-link-sub", targetProj.description));
+
+          const actionsWrap = el("div", "project-link-actions");
+          const explainAction = el("button", "btn btn-sm btn-explain", 'Explain Project →');
+          explainAction.type = "button";
+          explainAction.addEventListener("click", () => openProjectModal(targetProj, explainAction, "explain"));
+
+          const hoodAction = el("button", "btn btn-sm btn-hood", 'Under the Hood ⚡');
+          hoodAction.type = "button";
+          hoodAction.addEventListener("click", () => openProjectModal(targetProj, hoodAction, "hood"));
+
+          actionsWrap.append(explainAction, hoodAction);
+          projCard.append(info, actionsWrap);
+          flowBlock.appendChild(projCard);
+        }
+      });
+    }
+
+    grid.append(techBlock, flowBlock);
+    inspector.append(header, grid);
+  }
+
+  function initTraceMyStack() {
+    const traceBtn = document.getElementById("btn-trace-toggle");
+    const tracePathsBar = document.getElementById("trace-paths-bar");
+    const tracePresets = document.getElementById("trace-presets");
+    const traceView = document.getElementById("blueprint-trace-view");
+    const resetBtn = document.getElementById("btn-reset-blueprint");
+
+    if (!traceBtn || !tracePathsBar || !tracePresets || !traceView) return;
+
+    const bp = data.blueprint;
+    if (!bp || !Array.isArray(bp.stackTraces)) return;
+
+    tracePresets.innerHTML = "";
+    bp.stackTraces.forEach(function (trace, idx) {
+      const pill = el("button", `trace-pill ${idx === 0 ? 'active' : ''}`, trace.name);
+      pill.type = "button";
+      pill.dataset.traceId = trace.id;
+      pill.addEventListener("click", () => selectTracePath(trace.id));
+      tracePresets.appendChild(pill);
+    });
+
+    activeTraceId = bp.stackTraces[0].id;
+
+    function toggleTraceMode(forceState) {
+      isTraceMode = forceState !== undefined ? forceState : !isTraceMode;
+      traceBtn.classList.toggle("active", isTraceMode);
+      traceBtn.setAttribute("aria-expanded", String(isTraceMode));
+      tracePathsBar.hidden = !isTraceMode;
+      traceView.hidden = !isTraceMode;
+
+      if (isTraceMode) {
+        renderActiveTrace();
+        traceView.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+
+    traceBtn.addEventListener("click", () => toggleTraceMode());
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        selectBlueprintDomain("all");
+        toggleTraceMode(false);
+      });
+    }
+
+    const domainTabs = document.querySelectorAll(".domain-tab");
+    domainTabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        selectBlueprintDomain(tab.dataset.domain);
+      });
     });
   }
 
+  function selectTracePath(traceId) {
+    activeTraceId = traceId;
+    const pills = document.querySelectorAll(".trace-pill");
+    pills.forEach(pill => pill.classList.toggle("active", pill.dataset.traceId === traceId));
+    renderActiveTrace();
+  }
+
+  function renderActiveTrace() {
+    const traceView = document.getElementById("blueprint-trace-view");
+    if (!traceView) return;
+
+    const bp = data.blueprint;
+    if (!bp || !Array.isArray(bp.stackTraces)) return;
+
+    const trace = bp.stackTraces.find(t => t.id === activeTraceId) || bp.stackTraces[0];
+    if (!trace) return;
+
+    traceView.innerHTML = "";
+
+    const head = el("div", "trace-view-head");
+    head.appendChild(el("h4", "trace-view-title", `Stack Trace: ${trace.name}`));
+    head.appendChild(el("p", "trace-view-summary", trace.summary));
+    traceView.appendChild(head);
+
+    const stepperList = el("div", "trace-stepper-list");
+    if (Array.isArray(trace.steps)) {
+      trace.steps.forEach(function (step, index) {
+        const isLast = index === trace.steps.length - 1;
+        const card = el("div", `trace-step-node-card ${isLast ? 'final-step' : ''}`);
+        card.append(
+          el("span", "trace-step-seq", `STEP 0${index + 1}`),
+          el("strong", "trace-step-name", step.node),
+          el("span", "trace-step-role", step.role),
+          el("p", "trace-step-note", step.note)
+        );
+        stepperList.appendChild(card);
+      });
+    }
+    traceView.appendChild(stepperList);
+  }
+
   /* ---------------------------------------------------------
-     8. WHY I BUILD
+     9. WHY I BUILD, FOCUS, DEV LOG, WHAT I WORK WITH, JOURNEY
      --------------------------------------------------------- */
   function renderWhyIBuild() {
     const quoteNode = document.getElementById("why-build-quote");
     const detailNode = document.getElementById("why-build-detail");
     const w = data.whyIBuild || {};
-
-    if (quoteNode && w.quote) {
-      quoteNode.textContent = `"${w.quote.replace(/^"|"$/g, '')}"`;
-    }
-    if (detailNode && w.detail) {
-      detailNode.textContent = w.detail;
-    }
+    if (quoteNode && w.quote) quoteNode.textContent = `"${w.quote.replace(/^"|"$/g, '')}"`;
+    if (detailNode && w.detail) detailNode.textContent = w.detail;
   }
 
-  /* ---------------------------------------------------------
-     9. CURRENTLY BUILDING (2026 TRACKS)
-     --------------------------------------------------------- */
   function renderCurrentlyBuilding() {
     const grid = document.getElementById("currently-building-grid");
     if (!grid || !Array.isArray(data.currentlyBuilding)) return;
     grid.innerHTML = "";
 
     data.currentlyBuilding.forEach(function (track) {
-      const card = el("div", "track-card");
-
+      const card = el("div", "track-card reveal-item");
       const head = el("div", "track-head");
       const numWrap = el("div", "track-num-wrap");
-      numWrap.appendChild(el("span", "track-num", track.track));
-      numWrap.appendChild(el("h3", "track-area", track.area));
-      head.appendChild(numWrap);
-
-      head.appendChild(el("span", "track-year-badge", track.year || "2026"));
-
-      const summary = el("p", "track-summary", track.summary);
-      const detail = el("p", "track-detail", track.detail);
-
-      card.append(head, summary, detail);
+      numWrap.append(el("span", "track-num", track.track), el("h3", "track-area", track.area));
+      head.append(numWrap, el("span", "track-year-badge", track.year));
+      card.append(head, el("p", "track-summary", track.summary), el("p", "track-detail", track.detail));
       grid.appendChild(card);
     });
   }
 
-  /* ---------------------------------------------------------
-     10. DEV LOG (Learning Stream)
-     --------------------------------------------------------- */
-  function renderActivity() {
+  function renderDevLog() {
     const list = document.getElementById("devlog-list");
     if (!list || !Array.isArray(data.activity)) return;
     list.innerHTML = "";
 
-    const profile = data.profile || {};
-
-    data.activity.forEach(function (post) {
-      const item = el("article", "devlog-item");
-
-      const avatar = el("div", "devlog-avatar", profile.initials || "VN");
-
-      const body = el("div");
+    data.activity.forEach(function (item) {
+      const card = el("div", "devlog-item reveal-item");
+      const avatar = el("div", "devlog-avatar", "VN");
+      const body = el("div", "devlog-body");
       const head = el("div", "devlog-head");
-      head.appendChild(el("span", "devlog-name", profile.name || "Vedh Naik"));
-      head.appendChild(el("span", "devlog-handle", profile.handle || "@vedhdev"));
-      head.appendChild(el("span", "devlog-date", formatDate(post.date)));
+      head.append(
+        el("strong", "devlog-name", "Vedh Naik"),
+        el("span", "devlog-handle", "@vedhdev"),
+        el("span", "devlog-date", item.date)
+      );
 
-      const content = el("p", "devlog-content", post.content);
-
-      body.append(head, content);
-
-      if (Array.isArray(post.tags) && post.tags.length > 0) {
-        const tagsWrap = el("div", "devlog-tags");
-        post.tags.forEach(function (t) {
-          tagsWrap.appendChild(el("span", null, `#${t}`));
-        });
-        body.appendChild(tagsWrap);
+      const content = el("p", "devlog-content", item.content);
+      const tags = el("div", "devlog-tags");
+      if (Array.isArray(item.tags)) {
+        item.tags.forEach(t => tags.appendChild(el("span", null, `#${t}`)));
       }
 
-      item.append(avatar, body);
-      list.appendChild(item);
+      body.append(head, content, tags);
+      card.append(avatar, body);
+      list.appendChild(card);
     });
   }
 
-  /* ---------------------------------------------------------
-     11. WHAT I WORK WITH (CLEAN TECHNICAL BREADTH)
-     --------------------------------------------------------- */
   function renderTechBreadth() {
     const grid = document.getElementById("tech-breadth-grid");
     if (!grid || !Array.isArray(data.whatIWorkWith)) return;
     grid.innerHTML = "";
 
-    data.whatIWorkWith.forEach(function (group) {
-      const card = el("div", "tech-category-card");
-
-      const label = el("h3", "tech-category-label", group.category);
-      card.appendChild(label);
-
+    data.whatIWorkWith.forEach(function (cat) {
+      const card = el("div", "tech-category-card reveal-item");
+      const label = el("div", "tech-category-label", cat.category);
       const itemsWrap = el("div", "tech-category-items");
-      if (Array.isArray(group.items)) {
-        group.items.forEach(function (item) {
-          itemsWrap.appendChild(el("span", "tech-item-chip", item));
-        });
+      if (Array.isArray(cat.items)) {
+        cat.items.forEach(item => itemsWrap.appendChild(el("span", "tech-item-chip", item)));
       }
-      card.appendChild(itemsWrap);
+      card.append(label, itemsWrap);
       grid.appendChild(card);
     });
   }
 
-  /* ---------------------------------------------------------
-     12. JOURNEY / EDUCATION TIMELINE
-     --------------------------------------------------------- */
   function renderJourney() {
     const list = document.getElementById("journey-list");
     if (!list || !Array.isArray(data.journey)) return;
     list.innerHTML = "";
 
-    data.journey.forEach(function (step) {
-      const item = el("div", "journey-item");
-      item.appendChild(el("div", "journey-year", step.year));
-      item.appendChild(el("div", "journey-title", step.title));
-      item.appendChild(el("div", "journey-place", step.place));
-      if (step.detail) {
-        item.appendChild(el("div", "journey-detail", step.detail));
-      }
-      list.appendChild(item);
+    data.journey.forEach(function (item) {
+      const card = el("div", "journey-item reveal-item");
+      card.append(
+        el("div", "journey-year", item.year),
+        el("div", "journey-title", item.title),
+        el("div", "journey-place", item.place),
+        el("div", "journey-detail", item.detail)
+      );
+      list.appendChild(card);
     });
   }
 
-  /* ---------------------------------------------------------
-     13. HOW I BUILD (WORKFLOW SEQUENCE)
-     --------------------------------------------------------- */
   function renderHowIBuild() {
-    const seqWrap = document.getElementById("how-build-sequence");
-    const statementNode = document.getElementById("how-build-statement");
+    const seq = document.getElementById("how-build-sequence");
+    const stmt = document.getElementById("how-build-statement");
     const h = data.howIBuild || {};
 
-    if (seqWrap && Array.isArray(h.steps)) {
-      seqWrap.innerHTML = "";
+    if (seq && Array.isArray(h.steps)) {
+      seq.innerHTML = "";
       h.steps.forEach(function (step) {
-        const stepCard = el("div", "how-step-card");
-        stepCard.appendChild(el("span", "how-step-num", step.num));
-        stepCard.appendChild(el("h4", "how-step-name", step.name));
-        stepCard.appendChild(el("p", "how-step-desc", step.desc));
-        seqWrap.appendChild(stepCard);
+        const card = el("div", "how-step-card reveal-item");
+        card.append(
+          el("span", "how-step-num", step.num),
+          el("strong", "how-step-name", step.name),
+          el("p", "how-step-desc", step.desc)
+        );
+        seq.appendChild(card);
       });
     }
 
-    if (statementNode && h.statement) {
-      statementNode.textContent = `"${h.statement.replace(/^"|"$/g, '')}"`;
+    if (stmt && h.statement) {
+      stmt.textContent = `"${h.statement.replace(/^"|"$/g, '')}"`;
     }
   }
 
   /* ---------------------------------------------------------
-     14. TERMINAL EASTER EGG
+     10. RETRO-OS INTERACTIVE TERMINAL EASTER EGG
      --------------------------------------------------------- */
-  function initTerminal() {
-    const overlay = document.getElementById("terminal-overlay");
-    const body = document.getElementById("terminal-body");
+  function initTerminalEasterEgg() {
+    const modal = document.getElementById("terminal-modal");
+    const output = document.getElementById("terminal-output");
     const input = document.getElementById("terminal-input");
-    const openBtn = document.getElementById("terminal-open-btn");
+    const form = document.getElementById("terminal-form");
     const closeBtn = document.getElementById("terminal-close-btn");
-    const dotClose = document.getElementById("term-dot-close");
-    const shortcutBadge = document.getElementById("hero-term-badge");
+    const navBtn = document.getElementById("terminal-toggle");
+    const floatBtn = document.getElementById("terminal-float-btn");
+    const mobileBtn = document.getElementById("mobile-terminal-btn");
 
-    if (!overlay || !body || !input) return;
+    if (!modal || !output || !input || !form) return;
 
-    let terminalOpenedOnce = false;
-    const history = [];
+    let history = [];
     let historyIndex = -1;
-
-    function print(text, cls) {
-      const line = el("div", "terminal-line" + (cls ? " " + cls : ""), text);
-      body.appendChild(line);
-      body.scrollTop = body.scrollHeight;
-    }
-
-    function printBlock(lines, cls) {
-      lines.forEach(function (l) { print(l, cls); });
-    }
-
-    function welcome() {
-      body.innerHTML = "";
-      printBlock([
-        "vedh@portfolio:~$ init --session",
-        "Vedh Jayesh Naik — Developer Terminal v3.0",
-        "Interactive environment. Type \"help\" to list available commands.",
-        "--------------------------------------------------"
-      ], "dim");
-      print("");
-    }
+    let hasBooted = false;
 
     const availableCommands = [
-      "help", "about", "proof", "projects", "stack", "skills", "learning", "currently",
-      "why", "how", "activity", "journey", "contact", "whoami", "theme", "date", "clear", "exit"
+      "help", "about", "proof", "projects", "blueprint", "stack",
+      "tracks", "focus", "devlog", "skills", "journey", "theme",
+      "whoami", "contact", "clear", "exit", "matrix", "sudo", "quote"
     ];
 
-    const commandHandlers = {
-      help: function () {
-        printBlock([
-          "Available Commands:",
-          "",
-          "  about      — Display developer biography & identity",
-          "  proof      — Show verified hands-on Proof of Work",
-          "  projects   — List verified featured projects & architectures",
-          "  stack      — Display technical breadth (What I Work With)",
-          "  learning   — List active 2026 learning tracks",
-          "  why        — Display core motivation & developer philosophy",
-          "  how        — Display 6-step engineering learning sequence",
-          "  activity   — Show recent Dev Log progress entries",
-          "  journey    — Display education & academic milestones",
-          "  contact    — Display direct contact links (Email, GitHub)",
-          "  theme      — Switch theme (e.g. \"theme dark\" or \"theme light\")",
-          "  whoami     — View terminal session role",
-          "  date       — Show current local system time",
-          "  clear      — Clear terminal screen",
-          "  exit       — Close the terminal window"
-        ]);
-      },
+    function printLine(text, cssClass) {
+      const line = el("div", `terminal-line ${cssClass || ''}`, text);
+      output.appendChild(line);
+      const body = document.getElementById("terminal-body");
+      if (body) body.scrollTop = body.scrollHeight;
+    }
 
-      about: function () {
-        const p = data.profile || {};
-        printBlock([
-          `Name:     ${p.fullName || p.name}`,
-          `Role:     ${p.title}`,
-          `Focus:    ${(p.focusAreas || []).join(" · ")}`,
-          `Location: ${p.location}`,
-          `Status:   ${p.statusBadge || "Available for internships"}`,
-          "",
-          `Bio: ${p.about}`
-        ]);
-      },
+    function runBootSequence(callback) {
+      output.innerHTML = "";
+      input.disabled = true;
 
-      whoami: function () {
-        print("guest@vedh.dev [Visitor — Recruiter / Engineer / Judge]");
-      },
+      const bootLines = [
+        { text: "[INIT] Initializing VEDH-OS shell v2.6.4 (x86_64-apple-darwin)...", class: "term-boot" },
+        { text: "[LOAD] Mounting core modules: proof, blueprint, stack, telemetry...", class: "term-muted" },
+        { text: "[NET] Establishing loopback socket 127.0.0.1:8080 (TLS 1.3)...", class: "term-muted" },
+        { text: "[OK] Core environment loaded. Ready.", class: "term-success" },
+        { text: "Type 'help' to see available commands or 'projects' to inspect code.", class: "term-highlight" }
+      ];
 
-      date: function () {
-        print(new Date().toString(), "highlight");
-      },
-
-      proof: function () {
-        print("");
-        if (Array.isArray(data.proofOfWork)) {
-          data.proofOfWork.forEach(function (card) {
-            print(`[${card.domain}] ${card.title} ${card.badge ? `(${card.badge})` : ''}`, "cmd");
-            print(`  Tech: ${(card.tech || []).join(" · ")}`, "highlight");
-            print(`  ${card.description}`);
-            print("");
-          });
-        }
-      },
-
-      projects: function () {
-        print("");
-        if (Array.isArray(data.projects)) {
-          data.projects.forEach(function (p, idx) {
-            print(`[${idx + 1}] ${p.name} (${p.status})`, "cmd");
-            print(`    Overview: ${p.description}`, "dim");
-            print(`    Stack:    ${(p.tech || []).join(" · ")}`, "highlight");
-            if (p.github) print(`    Source:   ${p.github}`, "dim");
-            if (p.demo) print(`    Demo:     ${p.demo}`, "dim");
-            print("");
-          });
-        }
-      },
-
-      stack: function () {
-        print("");
-        if (Array.isArray(data.whatIWorkWith)) {
-          data.whatIWorkWith.forEach(function (g) {
-            print(`${g.category}:`, "highlight");
-            print(`  ${(g.items || []).join(" · ")}`, "dim");
-          });
-        }
-      },
-
-      skills: function () {
-        commandHandlers.stack();
-      },
-
-      learning: function () {
-        print("");
-        if (Array.isArray(data.currentlyBuilding)) {
-          data.currentlyBuilding.forEach(function (track) {
-            print(`[Track ${track.track}] ${track.area} (${track.year})`, "highlight");
-            print(`  Summary: ${track.summary}`);
-            print(`  Detail:  ${track.detail}`, "dim");
-            print("");
-          });
-        }
-      },
-
-      currently: function () {
-        commandHandlers.learning();
-      },
-
-      why: function () {
-        const w = data.whyIBuild || {};
-        print("");
-        print(`"${w.quote}"`, "highlight");
-        print(`\n${w.detail}`);
-      },
-
-      how: function () {
-        const h = data.howIBuild || {};
-        print("");
-        if (Array.isArray(h.steps)) {
-          h.steps.forEach(function (s) {
-            print(`${s.num} — ${s.name}: ${s.desc}`, "cmd");
-          });
-        }
-        print(`\n"${h.statement}"`, "highlight");
-      },
-
-      activity: function () {
-        print("");
-        if (Array.isArray(data.activity)) {
-          data.activity.forEach(function (post) {
-            print(`[${formatDate(post.date)}]`, "highlight");
-            print(`  ${post.content}`);
-            if (post.tags) {
-              print(`  tags: ${post.tags.map(t => '#' + t).join(" ")}`, "dim");
-            }
-            print("");
-          });
-        }
-      },
-
-      journey: function () {
-        print("");
-        if (Array.isArray(data.journey)) {
-          data.journey.forEach(function (s) {
-            print(`${s.year} — ${s.title}`, "cmd");
-            print(`  ${s.place} (${s.detail})`, "dim");
-          });
-        }
-      },
-
-      contact: function () {
-        const p = data.profile || {};
-        const links = p.links || {};
-        printBlock([
-          `Email:    ${p.email}`,
-          `GitHub:   ${links.github}`,
-          `LinkedIn: ${isPlaceholder(links.linkedin) ? "Pending configuration" : links.linkedin}`,
-          `Location: ${p.location}`,
-          `Status:   ${p.statusBadge}`
-        ]);
-      },
-
-      theme: function (args) {
-        const target = (args[0] || "").toLowerCase();
-        if (target === "light") {
-          setTheme("light");
-          print("Theme set to LIGHT.", "cmd");
-        } else if (target === "dark") {
-          setTheme("dark");
-          print("Theme set to DARK.", "cmd");
+      let i = 0;
+      function next() {
+        if (i < bootLines.length) {
+          printLine(bootLines[i].text, bootLines[i].class);
+          i++;
+          setTimeout(next, 120);
         } else {
-          const current = document.documentElement.getAttribute("data-theme") || "dark";
-          const next = current === "dark" ? "light" : "dark";
-          setTheme(next);
-          print(`Theme toggled to ${next.toUpperCase()}.`, "cmd");
+          input.disabled = false;
+          input.focus();
+          hasBooted = true;
+          if (callback) callback();
         }
-      },
-
-      clear: function () {
-        body.innerHTML = "";
-      },
-
-      exit: function () {
-        closeTerminal();
       }
-    };
-
-    function runCommand(raw) {
-      const trimmed = raw.trim();
-      print(`vedh@portfolio:~$ ${raw}`, "cmd");
-      if (!trimmed) {
-        print("");
-        return;
-      }
-
-      history.push(raw);
-      historyIndex = history.length;
-
-      const parts = trimmed.split(/\s+/);
-      const cmd = parts[0].toLowerCase();
-      const args = parts.slice(1);
-
-      if (commandHandlers[cmd]) {
-        commandHandlers[cmd](args);
-      } else {
-        print(`Command not found: "${cmd}". Type "help" to see available commands.`, "err");
-      }
-      print("");
+      next();
     }
 
     function openTerminal() {
-      overlay.hidden = false;
+      modal.hidden = false;
       document.body.style.overflow = "hidden";
-      if (!terminalOpenedOnce) {
-        welcome();
-        terminalOpenedOnce = true;
+
+      if (!hasBooted) {
+        runBootSequence();
+      } else {
+        input.focus();
       }
-      input.value = "";
-      setTimeout(function () { input.focus(); }, 30);
     }
 
     function closeTerminal() {
-      overlay.hidden = true;
+      modal.hidden = true;
       document.body.style.overflow = "";
-      if (openBtn) openBtn.focus();
     }
 
-    if (openBtn) openBtn.addEventListener("click", openTerminal);
+    // Toggle triggers
+    if (navBtn) navBtn.addEventListener("click", openTerminal);
+    if (floatBtn) floatBtn.addEventListener("click", openTerminal);
+    if (mobileBtn) mobileBtn.addEventListener("click", openTerminal);
     if (closeBtn) closeBtn.addEventListener("click", closeTerminal);
-    if (dotClose) dotClose.addEventListener("click", closeTerminal);
-    if (shortcutBadge) {
-      shortcutBadge.style.cursor = "pointer";
-      shortcutBadge.addEventListener("click", openTerminal);
-    }
 
-    overlay.addEventListener("click", function (e) {
-      if (e.target === overlay) closeTerminal();
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) closeTerminal();
     });
 
+    // Keyboard Shortcuts: ` or ~ or Ctrl+` or Alt+T
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "~" || e.key === "`" || (e.ctrlKey && e.key === "`") || (e.altKey && e.key.toLowerCase() === "t")) {
+        // Prevent typing backtick into regular textareas if terminal is closed
+        if (modal.hidden && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+          e.preventDefault();
+          openTerminal();
+        }
+      } else if (e.key === "Escape" && !modal.hidden) {
+        closeTerminal();
+      }
+    });
+
+    // Form Submit (Command Evaluation)
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const rawCmd = input.value.trim();
+      if (!rawCmd) return;
+
+      history.push(rawCmd);
+      historyIndex = history.length;
+      printLine(`vedh@portfolio:~$ ${rawCmd}`, "term-cmd-echo");
+      input.value = "";
+
+      executeCommand(rawCmd.toLowerCase());
+    });
+
+    // Up/Down History & Tab Completion
     input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        const val = input.value;
-        input.value = "";
-        runCommand(val);
-      } else if (e.key === "ArrowUp") {
+      if (e.key === "ArrowUp") {
         e.preventDefault();
         if (history.length > 0 && historyIndex > 0) {
           historyIndex--;
@@ -942,49 +1296,195 @@
         }
       } else if (e.key === "Tab") {
         e.preventDefault();
-        const current = input.value.trim().toLowerCase();
+        const current = input.value.toLowerCase().trim();
         if (current) {
           const match = availableCommands.find(c => c.startsWith(current));
-          if (match) {
-            input.value = match;
-          }
+          if (match) input.value = match;
         }
       }
     });
 
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && !overlay.hidden) {
-        closeTerminal();
+    function executeCommand(cmd) {
+      const parts = cmd.split(" ");
+      const root = parts[0];
+      const arg = parts[1];
+
+      switch (root) {
+        case "help":
+          printLine("Available commands:", "term-highlight");
+          printLine("  about         - Background, profile & academic pursuit");
+          printLine("  projects      - List authentic personal projects & coursework");
+          printLine("  proof [id]    - Open deep-dive modal for a project (e.g. proof twincore)");
+          printLine("  blueprint     - View interactive 4-domain technical architecture");
+          printLine("  stack         - View categorized languages, systems & tools");
+          printLine("  tracks        - 2026 active development tracks (Currently Building)");
+          printLine("  devlog        - Chronological technical journal stream");
+          printLine("  theme [mode]  - Switch theme ('theme dark', 'theme light', or 'theme')");
+          printLine("  whoami        - CS candidate identity & system credentials");
+          printLine("  contact       - Direct contact email & verified profiles");
+          printLine("  clear         - Clear terminal display buffer");
+          printLine("  exit          - Close interactive shell");
+          break;
+
+        case "about":
+          printLine(`Name: ${data.profile.fullName || data.profile.name}`, "term-highlight");
+          printLine(`Focus: ${data.profile.title}`);
+          printLine(`Location: ${data.profile.location}`);
+          printLine(`Bio: ${data.profile.about}`);
+          break;
+
+        case "projects":
+        case "proof":
+          if (arg) {
+            const match = (data.projects || []).find(p => p.id.toLowerCase() === arg.toLowerCase());
+            if (match) {
+              printLine(`Opening architecture modal for ${match.title || match.name}...`, "term-success");
+              openProjectModal(match, null, "explain");
+              closeTerminal();
+            } else {
+              printLine(`Project '${arg}' not found. Valid IDs: twincore, facilityops, ml-experiments, networks-lab, vedh-portfolio`, "term-warn");
+            }
+          } else {
+            printLine("Verified Projects & Case Studies:", "term-highlight");
+            (data.projects || []).forEach(p => {
+              printLine(`  [${p.id}] ${p.title} (${p.category}) - ${p.status}`);
+            });
+            printLine("Tip: Type 'proof <id>' (e.g. 'proof twincore') to open its deep-dive modal.", "term-muted");
+          }
+          break;
+
+        case "blueprint":
+        case "stack":
+          printLine("Engineering Blueprint Domains:", "term-highlight");
+          printLine("  1. Cloud / DevOps    : AWS (EC2, VPC, RDS), Terraform HCL, Docker, K3s, Jenkins");
+          printLine("  2. Development       : JavaScript ES6+, HTML5/CSS3, Python FastAPI, C++, React");
+          printLine("  3. Cybersecurity     : Linux/WSL, TCP/IP, Sockets, Nmap, Wireshark");
+          printLine("  4. Machine Learning  : Python, NumPy, Pandas, scikit-learn, Decision Trees");
+          break;
+
+        case "tracks":
+        case "focus":
+          printLine("2026 Technical Progression Focus:", "term-highlight");
+          (data.currentlyBuilding || []).forEach(t => {
+            printLine(`  Track ${t.track}: ${t.area} (${t.year}) - ${t.summary}`);
+          });
+          break;
+
+        case "devlog":
+          printLine("Recent Dev Log Entries:", "term-highlight");
+          (data.activity || []).forEach(a => {
+            printLine(`  * [${a.date}] ${a.content}`);
+          });
+          break;
+
+        case "skills":
+          printLine("What I Work With:", "term-highlight");
+          (data.whatIWorkWith || []).forEach(w => {
+            printLine(`  ${w.category}: ${w.items.join(", ")}`);
+          });
+          break;
+
+        case "theme":
+          const current = document.documentElement.getAttribute("data-theme") || "dark";
+          let target = arg;
+          if (!target) target = current === "dark" ? "light" : "dark";
+          if (target === "dark" || target === "light") {
+            if (window.setSiteTheme) window.setSiteTheme(target);
+            localStorage.setItem("vedh_theme", target);
+            printLine(`Theme switched to '${target}' mode.`, "term-success");
+          } else {
+            printLine("Usage: theme [dark | light]", "term-warn");
+          }
+          break;
+
+        case "whoami":
+          printLine("vedh@kernel-v2.6: Computer Science Student & Hands-on Developer", "term-highlight");
+          printLine("Clearance: Intern Candidate / Lvl-1 Systems Builder");
+          printLine("Core Motto: 'Understand how things work beneath the surface.'");
+          break;
+
+        case "contact":
+          printLine(`Email   : ${data.profile.email}`, "term-highlight");
+          printLine(`GitHub  : ${data.profile.links.github}`);
+          printLine(`LinkedIn: ${data.profile.links.linkedin}`);
+          break;
+
+        case "clear":
+          output.innerHTML = "";
+          break;
+
+        case "exit":
+          printLine("Terminating session...", "term-muted");
+          setTimeout(closeTerminal, 250);
+          break;
+
+        case "quote":
+        case "quote.txt":
+          printLine(`"${data.whyIBuild.quote}"`, "term-highlight");
+          break;
+
+        case "matrix":
+          printLine("Wake up, Neo... Follow the green prompt.", "term-success");
+          break;
+
+        case "sudo":
+          printLine("User 'vedh' is not in the sudoers file. This incident will be reported.", "term-error");
+          break;
+
+        default:
+          printLine(`Command not recognized: '${root}'. Type 'help' for available commands.`, "term-error");
+          break;
       }
-      // Global shortcut: ` (backtick) or ~ opens terminal when not editing form fields
-      if ((e.key === "`" || e.key === "~") && overlay.hidden) {
-        const active = document.activeElement;
-        const isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
-        if (!isInput) {
-          e.preventDefault();
-          openTerminal();
-        }
-      }
-    });
+    }
   }
 
   /* ---------------------------------------------------------
-     15. INITIALIZATION
+     11. SCROLL REVEAL OBSERVER
+     --------------------------------------------------------- */
+  function initScrollReveals() {
+    if (!("IntersectionObserver" in window)) {
+      document.querySelectorAll(".reveal-item").forEach(el => el.classList.add("is-revealed"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-revealed");
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: "0px 0px -40px 0px",
+      threshold: 0.05
+    });
+
+    document.querySelectorAll(".reveal-item").forEach(el => observer.observe(el));
+  }
+
+  /* ---------------------------------------------------------
+     12. INITIALIZATION & LIFECYCLE
      --------------------------------------------------------- */
   function init() {
     initTheme();
-    initMobileNav();
-    renderProfile();
-    renderProjects();
+    initScrollTracking();
+    initNavigation();
     initModal();
-    renderProofOfWork();
+
+    renderProfile();
+    renderProofOfWork("all");
+    initProofFilters();
+    renderBlueprint();
+    initBlueprintParticles();
+    initTraceMyStack();
     renderWhyIBuild();
     renderCurrentlyBuilding();
-    renderActivity();
+    renderDevLog();
     renderTechBreadth();
     renderJourney();
     renderHowIBuild();
-    initTerminal();
+    initTerminalEasterEgg();
+    initScrollReveals();
   }
 
   if (document.readyState === "loading") {
@@ -992,5 +1492,4 @@
   } else {
     init();
   }
-
 })();
