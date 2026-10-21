@@ -1,73 +1,82 @@
-# Vedh Naik — Personal Developer Portfolio
+# Vedh Jayesh Naik — Personal Developer Portfolio
 
-A high-performance personal developer portfolio built with **vanilla HTML5, CSS3, and JavaScript (ES6+)**.
+The personal portfolio of **Vedh Jayesh Naik**, an entry-level software development candidate and B.Tech Computer Science & Engineering student at ITM, Kharghar.
 
-Designed around authentic technical proof of work, verified projects, and clear engineering capabilities:
-1. **Featured Projects & Under the Hood** — Interactive architectural breakdowns showing verified data flow, what was built, and key takeaways.
-2. **Engineering Blueprint** — Central interactive architecture map connecting 4 major domains (Development, Cybersecurity, Cloud/DevOps, Machine Learning).
-3. **Trace My Stack** — Guided interactive pathways demonstrating how foundational languages and operating systems connect to real deployed systems.
-4. **Proof of Work** — Verified hands-on experience across Web Development, Cloud & DevOps, Networking & Security, and Machine Learning.
-5. **Currently Building** — Active 2026 focus tracks in Machine Learning, Cybersecurity, and Cloud/DevOps.
-6. **Why I Build & How I Build** — Core engineering motivation and systematic 6-step problem-solving sequence.
-7. **Dev Log** — Chronological learning journal detailing ongoing projects and experiments.
-8. **What I Work With** — Categorized technical breadth (Build, Backend, Systems, Cloud, Security, Learning).
+Built with **clean, semantic, vanilla HTML5, CSS3, and JavaScript (ES6+)** with zero external dependencies and zero build step.
+
+Deployed live on Vercel at: [https://vedh-portfolio.vercel.app/](https://vedh-portfolio.vercel.app/)
 
 ---
 
-## Technical Stack
+## Portfolio Sections
 
-- **Markup**: Semantic HTML5 with complete ARIA attributes & SEO metadata.
-- **Styling**: Vanilla CSS3 with CSS Custom Properties (Design Tokens), Dark/Light theme support, and responsive breakpoints.
-- **Logic**: Vanilla JavaScript (ES6+), zero dependencies, zero build step.
-- **Data Layer**: Centralized data configuration in `data/content.js`.
-
----
-
-## Project Structure
-
-```text
-my_portfolio/
-├── index.html        # Semantic page structure & template bindings
-├── style.css         # Design system tokens, blueprint styling, dark/light themes
-├── script.js         # DOM rendering, blueprint system, modal, & theme logic
-├── data/
-│   └── content.js    # Single source of truth for all content & blueprint data
-├── assets/
-│   ├── profile/      # Profile picture storage
-│   └── projects/     # Project assets
-└── README.md         # Project documentation and developer guide
-```
+1. **Hero**: Quick introduction, status badge, profile picture, location, and key links (Resume, GitHub, LinkedIn, Email).
+2. **About**: Academic background (Diploma in Computer Engineering & B.Tech CSE) and career objectives.
+3. **Skills**: Honest technical skills grouped by category (Programming Languages, Web Development, Academic Fundamentals, Tools & Environment, and Cloud Fundamentals).
+4. **Projects**: Verified coursework and personal projects, featuring the C++ DSA practice project with room for future projects.
+5. **Achievements**: First prize recognition at Smart India Hackathon (SIH) 2024.
+6. **Education**: Chronological academic credentials from school, polytechnic diploma, and university degree.
+7. **Contact**: Direct communication links via email and professional socials.
 
 ---
 
-## Customization & Content Editing
+## Key Features
 
-All personal data, projects, skills, education, and links are managed centrally in **`data/content.js`**:
-
-| Section | Target in `data/content.js` |
-| :--- | :--- |
-| **Profile & Identity** | `SITE_DATA.profile` (name, title, tagline, location, bio, focus areas) |
-| **Engineering Blueprint** | `SITE_DATA.blueprint` (domains, technologies, connections, stackTraces) |
-| **Featured Projects** | `SITE_DATA.projects` (name, overview, tech, built, underTheHood, github, demo) |
-| **Contact & Socials** | `SITE_DATA.profile.links` (github, linkedin, resume) and `email` |
-| **Proof of Work** | `SITE_DATA.proofOfWork` (domain, title, badge, tech, description) |
-| **Why I Build** | `SITE_DATA.whyIBuild` (quote, detail) |
-| **Currently Building** | `SITE_DATA.currentlyBuilding` (track, area, year, summary, detail) |
-| **Dev Log Posts** | `SITE_DATA.activity` (date, content, topic tags) |
-| **Tech Breadth** | `SITE_DATA.whatIWorkWith` (category, items) |
-| **How I Build** | `SITE_DATA.howIBuild` (steps, statement) |
-| **Education & Journey** | `SITE_DATA.journey` (chronological academic milestones) |
+- **Semantic HTML5 & Accessibility**: Fully semantic sectioning (`header`, `main`, `section`, `article`, `footer`), high contrast color ratios, explicit image dimensions, visible focus outlines, and keyboard accessibility.
+- **Theme Support**: Seamless Dark Mode and Light Mode with system preference detection and `localStorage` persistence.
+- **Fast & Responsive**: Mobile-first responsive layout tested from 360px mobile viewports up to large desktop screens with zero horizontal scrolling.
+- **Performance Optimized**: Inline theme script to eliminate Flash of Unstyled Content (FOUC), modern WebP image support with fallback, and zero heavy dependencies.
 
 ---
 
-## Running Locally
+## Local Development
+
+You can run the portfolio locally using any static web server:
 
 ```bash
-# Python 3
+# Using Python 3
 python3 -m http.server 3000
 
-# or Node.js (npx serve)
+# or using Node.js
 npx serve .
 ```
 
-Then open `http://localhost:3000` in your web browser.
+Then visit [http://localhost:3000](http://localhost:3000) in your web browser.
+
+---
+
+## Adding New Projects
+
+To add a new project card, add an `<article class="project-card">` block to the `#projects` section in `index.html`:
+
+```html
+<article class="project-card">
+  <div class="project-card-header">
+    <div class="project-type-badge">Project Type</div>
+    <a href="<GITHUB_LINK>" class="project-link-icon" target="_blank" rel="noopener noreferrer" aria-label="View on GitHub">
+      <!-- SVG icon -->
+    </a>
+  </div>
+  <h3 class="project-title">
+    <a href="<GITHUB_LINK>" target="_blank" rel="noopener noreferrer">Project Title</a>
+  </h3>
+  <div class="project-tech-tags">
+    <span class="tech-pill">Tech 1</span>
+    <span class="tech-pill">Tech 2</span>
+  </div>
+  <p class="project-description">
+    Two-line concise description of the project problem, implementation, and results.
+  </p>
+  <div class="project-card-footer">
+    <a href="<GITHUB_LINK>" class="project-text-link" target="_blank" rel="noopener noreferrer">
+      <span>View on GitHub</span>
+    </a>
+  </div>
+</article>
+```
+
+---
+
+## License
+
+Personal portfolio content and code &copy; 2026 Vedh Jayesh Naik.
