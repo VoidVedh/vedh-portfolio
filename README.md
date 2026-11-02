@@ -1,82 +1,69 @@
-# Vedh Jayesh Naik — Personal Developer Portfolio
+# Vedh Jayesh Naik — Editorial Portfolio & Kayla Padilla Showcase
 
-The personal portfolio of **Vedh Jayesh Naik**, an entry-level software development candidate and B.Tech Computer Science & Engineering student at ITM, Kharghar.
+An authentic, editorial personal portfolio inspired by the literary and minimalist aesthetic of [kaylapadilla.org](https://kaylapadilla.org). Designed to completely replace generic developer templates with a high-status, publication-grade design system and interactive features.
 
-Built with **clean, semantic, vanilla HTML5, CSS3, and JavaScript (ES6+)** with zero external dependencies and zero build step.
-
-Deployed live on Vercel at: [https://vedh-portfolio.vercel.app/](https://vedh-portfolio.vercel.app/)
-
----
-
-## Portfolio Sections
-
-1. **Hero**: Quick introduction, status badge, profile picture, location, and key links (Resume, GitHub, LinkedIn, Email).
-2. **About**: Academic background (Diploma in Computer Engineering & B.Tech CSE) and career objectives.
-3. **Skills**: Honest technical skills grouped by category (Programming Languages, Web Development, Academic Fundamentals, Tools & Environment, and Cloud Fundamentals).
-4. **Projects**: Verified coursework and personal projects, featuring the C++ DSA practice project with room for future projects.
-5. **Achievements**: First prize recognition at Smart India Hackathon (SIH) 2024.
-6. **Education**: Chronological academic credentials from school, polytechnic diploma, and university degree.
-7. **Contact**: Direct communication links via email and professional socials.
+Live on Vercel: [https://vedh-portfolio.vercel.app/](https://vedh-portfolio.vercel.app/)
 
 ---
 
 ## Key Features
 
-- **Semantic HTML5 & Accessibility**: Fully semantic sectioning (`header`, `main`, `section`, `article`, `footer`), high contrast color ratios, explicit image dimensions, visible focus outlines, and keyboard accessibility.
-- **Theme Support**: Seamless Dark Mode and Light Mode with system preference detection and `localStorage` persistence.
-- **Fast & Responsive**: Mobile-first responsive layout tested from 360px mobile viewports up to large desktop screens with zero horizontal scrolling.
-- **Performance Optimized**: Inline theme script to eliminate Flash of Unstyled Content (FOUC), modern WebP image support with fallback, and zero heavy dependencies.
+1. **Dual-Profile Interactive Mode**:
+   - Seamlessly toggle between **Vedh Jayesh Naik** (Software Engineer, Smart India Hackathon '24 Winner) and **Kayla Padilla** (USC/Wharton alum, The Sideline Post Founder, Klutch Sports Analyst).
+   - Powered by the native **View Transitions API** (`document.startViewTransition`) with fluid reduced-motion fallbacks.
+
+2. **Signature "Current Song on Repeat" Audio Player Widget**:
+   - Located in the footer, directly paying homage to `kaylapadilla.org`.
+   - Features a spinning vinyl record animation, dancing soundwave equalizer, track information, and Spotify links.
+   - Built with an interactive **Web Audio API synthesizer** generating warm ambient and acoustic chord progressions directly in the browser with zero external MP3 dependencies.
+
+3. **Editorial Typography & Visual Hierarchy**:
+   - Built with **Newsreader** (editorial serif) and **Plus Jakarta Sans** (contemporary sans-serif).
+   - Warm parchment palette in Light Mode (`#fbfaf8`) and obsidian paper in Dark Mode (`#111113`).
+   - Clean literary drop caps and generous white space.
+
+4. **"My Projects (both serious and fun!)"**:
+   - Filterable projects grid (Technical & Systems, Creative & Media).
+   - Role badges, impact metrics, technical stacks, and direct repository/platform links.
+
+5. **Chronological Resume & Credentials**:
+   - High-signal track record highlighting education, leadership, and experience without juvenile skill progress bars.
+   - Direct PDF resume download support.
+
+6. **Media, Features & Helpful Resources**:
+   - Curated press coverage cards and public resources.
+
+7. **Zero Dependencies & Blazing Performance**:
+   - 100% semantic HTML5, modern CSS3 variables, and clean vanilla JavaScript (ES6+).
+   - Zero build step, instant deployment on Vercel.
 
 ---
 
 ## Local Development
 
-You can run the portfolio locally using any static web server:
+Run the portfolio locally with any static web server:
 
 ```bash
-# Using Python 3
+# Python 3
 python3 -m http.server 3000
 
-# or using Node.js
+# or Node.js
 npx serve .
 ```
 
-Then visit [http://localhost:3000](http://localhost:3000) in your web browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Adding New Projects
+## Deployment to Vercel
 
-To add a new project card, add an `<article class="project-card">` block to the `#projects` section in `index.html`:
-
-```html
-<article class="project-card">
-  <div class="project-card-header">
-    <div class="project-type-badge">Project Type</div>
-    <a href="<GITHUB_LINK>" class="project-link-icon" target="_blank" rel="noopener noreferrer" aria-label="View on GitHub">
-      <!-- SVG icon -->
-    </a>
-  </div>
-  <h3 class="project-title">
-    <a href="<GITHUB_LINK>" target="_blank" rel="noopener noreferrer">Project Title</a>
-  </h3>
-  <div class="project-tech-tags">
-    <span class="tech-pill">Tech 1</span>
-    <span class="tech-pill">Tech 2</span>
-  </div>
-  <p class="project-description">
-    Two-line concise description of the project problem, implementation, and results.
-  </p>
-  <div class="project-card-footer">
-    <a href="<GITHUB_LINK>" class="project-text-link" target="_blank" rel="noopener noreferrer">
-      <span>View on GitHub</span>
-    </a>
-  </div>
-</article>
+```bash
+# Deploy to production
+vercel --prod
 ```
 
 ---
 
 ## License
 
-Personal portfolio content and code &copy; 2026 Vedh Jayesh Naik.
+Code and editorial design &copy; 2026 Vedh Jayesh Naik. Homage to [kaylapadilla.org](https://kaylapadilla.org).
