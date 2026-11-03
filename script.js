@@ -1,8 +1,7 @@
 /**
  * script.js
  * --------------------------------------------------------------------------
- * Editorial Portfolio Engine
- * - Dynamic Profile Switching (Vedh Jayesh Naik <-> Kayla Padilla)
+ * Editorial Portfolio Engine — Vedh Jayesh Naik
  * - View Transitions API Integration
  * - Web Audio API Interactive Sound Player ("Current song on repeat")
  * - Project Filter & Dynamic Rendering
@@ -14,7 +13,7 @@
   'use strict';
 
   // State
-  let currentProfileId = localStorage.getItem('selected_profile') || 'vedh';
+  const currentProfileId = 'vedh';
   let currentFilter = 'all';
   let isPlayingAudio = false;
   let audioCtx = null;
@@ -24,7 +23,6 @@
 
   // DOM Elements Cache
   const themeToggleBtn = document.getElementById('theme-toggle');
-  const profileToggleBtns = document.querySelectorAll('[data-profile-select]');
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
   const navLinksList = document.getElementById('nav-links');
   const brandNameEl = document.getElementById('brand-name');
@@ -96,7 +94,7 @@
   }
 
   // =========================================================================
-  // Profile Switching & Rendering with View Transitions
+  // Profile Rendering (Vedh only — no switching)
   // =========================================================================
   function setProfile(profileId, skipTransition = false) {
     if (!PORTFOLIO_PROFILES[profileId]) return;
@@ -111,23 +109,12 @@
     });
 
     transition.finished.finally(() => {
-      // Focus management
       document.getElementById('main-content')?.focus();
     });
   }
 
   function applyProfileData(profileId) {
-    currentProfileId = profileId;
-    localStorage.setItem('selected_profile', profileId);
-
     const profile = PORTFOLIO_PROFILES[profileId];
-
-    // Update Profile Switcher UI state
-    profileToggleBtns.forEach(btn => {
-      const isSelected = btn.getAttribute('data-profile-select') === profileId;
-      btn.classList.toggle('active', isSelected);
-      btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
-    });
 
     // Update Brand & Monogram
     if (brandNameEl) brandNameEl.textContent = profile.name;
@@ -368,8 +355,8 @@
     const osc = audioCtx.createOscillator();
     const noteGain = audioCtx.createGain();
 
-    // Use warm sine/triangle wave for soothing lofi ambience
-    osc.type = currentProfileId === 'vedh' ? 'sine' : 'triangle';
+    // Use warm sine wave for soothing lofi ambience
+    osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
     const now = audioCtx.currentTime;
@@ -487,16 +474,6 @@
   // =========================================================================
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
-
-    // Attach profile switch handlers
-    profileToggleBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const selectedId = btn.getAttribute('data-profile-select');
-        if (selectedId && selectedId !== currentProfileId) {
-          setProfile(selectedId);
-        }
-      });
-    });
 
     // Attach project filter chips
     const filterChips = document.querySelectorAll('[data-filter]');

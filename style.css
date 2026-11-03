@@ -260,43 +260,6 @@ button, input, textarea {
   gap: 0.75rem;
 }
 
-/* Profile Mode Switcher Pill */
-.profile-switcher {
-  display: flex;
-  align-items: center;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  padding: 0.2rem;
-  position: relative;
-}
-
-.profile-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: var(--radius-full);
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color var(--transition-fast), background-color var(--transition-fast);
-  white-space: nowrap;
-}
-
-.profile-btn.active {
-  background-color: var(--bg-surface);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-subtle);
-}
-
-.profile-btn:hover:not(.active) {
-  color: var(--text-primary);
-}
-
 /* Theme Toggle */
 .icon-btn {
   display: inline-flex;
