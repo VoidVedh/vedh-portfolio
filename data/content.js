@@ -30,7 +30,7 @@ const PORTFOLIO_PROFILES = {
       paragraphs: [
         "I'm a first-year B.Tech Computer Science & Engineering student at ITM Kharghar. Before that, I completed a Diploma in Computer Engineering at VPM Polytechnic, Thane (MSBTE), where I built my foundation in programming, data structures, and computer networks.",
         "My main interests are cybersecurity and data science. I spend most of my time learning Linux, networking, and cloud fundamentals — setting up lab environments in WSL, inspecting traffic with Wireshark, and running discovery scans with Nmap to understand how systems actually talk to each other.",
-        "On the building side, I work with React and JavaScript for the web, and I've been learning AWS, Terraform, and Docker through my college practicals. I'm looking for an internship where I can learn from an experienced engineering team and contribute to real work."
+        "On the building side, I build web apps with React and JavaScript — including client work like a live sports event platform for a friend's startup — and I explore cloud fundamentals like AWS, Terraform, and Docker through my coursework practicals. I'm looking for an internship where I can learn from an experienced engineering team and contribute to real work."
       ]
     },
     quotes: [
@@ -60,10 +60,10 @@ const PORTFOLIO_PROFILES = {
       {
         id: "sportxtreme",
         title: "SportXtreme Events Platform",
-        role: "College Practical",
+        role: "Frontend Developer (Freelance / Client)",
         category: "web",
-        badge: "Live",
-        description: "Built as a college practical: a sports event management web app for listing tournaments, leagues, marathons, and school championships, with event registration and an admin area.",
+        badge: "Live Startup",
+        description: "Built for a friend's sports startup: a modern event management web platform for listing tournaments, leagues, marathons, and school championships, featuring online registration and an admin dashboard.",
         highlights: [
           "Built with React 18, Vite, and React Router; data and auth handled through Supabase",
           "Database schema changes tracked as numbered SQL migration files",
