@@ -1,6 +1,6 @@
 /* ==========================================================================
    Editorial Design System — style.css
-   Inspired by kaylapadilla.org: Warm, Literary, Confident, Zero "AI-Slop"
+   Vedh Jayesh Naik Personal Portfolio
    ========================================================================== */
 
 :root {
@@ -451,7 +451,7 @@ button, input, textarea {
 }
 
 /* ==========================================================================
-   Quotes & Philosophy Section (Kayla's Signature Style)
+   Quotes & Philosophy Section
    ========================================================================== */
 .quotes-section {
   padding-top: clamp(3rem, 6vw, 4.5rem);

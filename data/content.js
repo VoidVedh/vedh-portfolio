@@ -212,8 +212,6 @@ const PORTFOLIO_PROFILES = {
   }
 };
 
-// Only Vedh's profile — Kayla profile removed
-
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = PORTFOLIO_PROFILES;
 }
