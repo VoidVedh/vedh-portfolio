@@ -1,6 +1,6 @@
 # Vedh Jayesh Naik — Personal Portfolio
 
-An authentic, editorial personal portfolio for **Vedh Jayesh Naik** (Software Engineer, Builder, Smart India Hackathon '24 Winner). Designed with a publication-grade design system, clean web standards, and interactive features.
+An authentic, editorial personal portfolio for **Vedh Jayesh Naik** (Computer Science & Engineering student, ITM Kharghar). Designed with a publication-grade design system, clean web standards, and interactive features.
 
 Live on Vercel: [https://vedh-portfolio.vercel.app/](https://vedh-portfolio.vercel.app/)
 
@@ -25,8 +25,8 @@ Live on Vercel: [https://vedh-portfolio.vercel.app/](https://vedh-portfolio.verc
    - High-signal track record highlighting education, leadership, and experience.
    - Direct PDF resume download support.
 
-5. **Media, Features & Helpful Resources**:
-   - Curated honors, achievements, and public guides.
+5. **Currently Learning**:
+   - Current focus areas: cloud, security, and full-stack web.
 
 6. **Zero Dependencies & Blazing Performance**:
    - 100% semantic HTML5, modern CSS3 variables, and clean vanilla JavaScript (ES6+).

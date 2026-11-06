@@ -40,7 +40,6 @@
   const experienceTimelineEl = document.getElementById('experience-timeline');
   const educationGridEl = document.getElementById('education-grid');
   const mediaGridEl = document.getElementById('media-grid');
-  const resourcesGridEl = document.getElementById('resources-grid');
   const contactLeadEl = document.getElementById('contact-lead');
   const contactEmailDisplay = document.getElementById('contact-email-display');
   const copyEmailBtn = document.getElementById('copy-email-btn');
@@ -184,17 +183,16 @@
       }
     }
 
+    // Technical Skills (rendered in the left resume column)
     if (experienceTimelineEl) {
-      experienceTimelineEl.innerHTML = profile.experience.map(exp => `
+      experienceTimelineEl.innerHTML = profile.skills.map(group => `
         <article class="timeline-item">
           <div class="timeline-header">
-            <h3 class="timeline-role">${exp.title}</h3>
-            <span class="timeline-date">${exp.period}</span>
+            <h3 class="timeline-role">${group.title}</h3>
           </div>
-          <div class="timeline-company">${exp.company} &bull; ${exp.location}</div>
-          <ul class="timeline-bullets">
-            ${exp.bullets.map(b => `<li>${b}</li>`).join('')}
-          </ul>
+          <div class="project-tech-row" style="margin-top: 0.5rem;">
+            ${group.items.map(item => `<span class="tech-tag">${item}</span>`).join('')}
+          </div>
         </article>
       `).join('');
     }
@@ -210,39 +208,22 @@
       `).join('');
     }
 
-    // Media & Press
+    // Currently Learning
     if (mediaGridEl) {
-      mediaGridEl.innerHTML = profile.media.map(item => `
+      mediaGridEl.innerHTML = profile.learning.map(item => `
         <article class="media-card">
           <div class="media-meta-row">
             <span class="media-tag">${item.tag}</span>
-            <span class="media-year">${item.year}</span>
           </div>
           <h3 class="media-title">${item.title}</h3>
           <p class="media-summary">${item.summary}</p>
-          <div style="margin-top: 1rem; font-size: 0.8125rem; font-weight: 600; color: var(--accent);">
-            ${item.outlet}
-          </div>
         </article>
-      `).join('');
-    }
-
-    // Resources
-    if (resourcesGridEl) {
-      resourcesGridEl.innerHTML = profile.resources.map(res => `
-        <div class="resource-card">
-          <span class="resource-cat">${res.category}</span>
-          <h3 class="resource-title">${res.title}</h3>
-          <p class="resource-desc">${res.description}</p>
-        </div>
       `).join('');
     }
 
     // Contact
     if (contactLeadEl) {
-      contactLeadEl.textContent = profile.id === 'vedh'
-        ? "Interested in building great software together, discussing an open role, or reviewing code? Reach out directly."
-        : "Have any questions regarding basketball, school, internships, NIL opportunities, or music? Feel free to reach out!";
+      contactLeadEl.textContent = "Hiring for an internship, working on something interesting, or want to talk about a project? Reach out directly.";
     }
     if (contactEmailDisplay) contactEmailDisplay.textContent = profile.email;
 
