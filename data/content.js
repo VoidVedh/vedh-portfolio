@@ -30,7 +30,7 @@ const PORTFOLIO_PROFILES = {
       paragraphs: [
         "I'm a first-year B.Tech Computer Science & Engineering student at ITM Kharghar. Before that, I completed a Diploma in Computer Engineering at VPM Polytechnic, Thane (MSBTE), where I built my foundation in programming, data structures, and computer networks.",
         "My main interests are cybersecurity and data science. I spend most of my time learning Linux, networking, and cloud fundamentals — setting up lab environments in WSL, inspecting traffic with Wireshark, and running discovery scans with Nmap to understand how systems actually talk to each other.",
-        "On the building side, I work with React and JavaScript for the web, and I've been learning AWS, Terraform, and Docker through personal and coursework projects. I'm looking for an internship where I can learn from an experienced engineering team and contribute to real work."
+        "On the building side, I work with React and JavaScript for the web, and I've been learning AWS, Terraform, and Docker through my college practicals. I'm looking for an internship where I can learn from an experienced engineering team and contribute to real work."
       ]
     },
     quotes: [
@@ -60,10 +60,10 @@ const PORTFOLIO_PROFILES = {
       {
         id: "sportxtreme",
         title: "SportXtreme Events Platform",
-        role: "Developer",
+        role: "College Practical",
         category: "web",
         badge: "Live",
-        description: "A sports event management web app for listing tournaments, leagues, marathons, and school championships, with event registration and an admin area.",
+        description: "Built as a college practical: a sports event management web app for listing tournaments, leagues, marathons, and school championships, with event registration and an admin area.",
         highlights: [
           "Built with React 18, Vite, and React Router; data and auth handled through Supabase",
           "Database schema changes tracked as numbered SQL migration files",
@@ -93,10 +93,10 @@ const PORTFOLIO_PROFILES = {
       {
         id: "twincore",
         title: "TwinCore — Cloud DevOps Platform",
-        role: "Personal Project",
+        role: "College Practical",
         category: "cloud",
         badge: "IaC",
-        description: "A learning project that deploys a small telemetry dashboard and a Flask analytics API on AWS, covering the full path from infrastructure code to a running Kubernetes workload.",
+        description: "A college practical that deploys a small telemetry dashboard and a Flask analytics API on AWS, covering the full path from infrastructure code to a running Kubernetes workload.",
         highlights: [
           "Terraform provisions the VPC, subnets, security groups, and an EC2 instance",
           "Dashboard and Flask API containerized with Docker and run on K3s",
@@ -110,10 +110,10 @@ const PORTFOLIO_PROFILES = {
       {
         id: "facilityops",
         title: "FacilityOps — Building Operations App",
-        role: "Coursework Project",
+        role: "College Practical",
         category: "cloud",
         badge: "Full Stack",
-        description: "A facility management web app with a React frontend and FastAPI backend, designed for deployment on AWS with infrastructure defined in Terraform.",
+        description: "A college practical: a facility management web app with a React frontend and FastAPI backend, designed for deployment on AWS with infrastructure defined in Terraform.",
         highlights: [
           "React + TypeScript frontend, FastAPI + SQLAlchemy backend with JWT auth",
           "Designed around MySQL on RDS and S3 for document storage",
@@ -127,10 +127,10 @@ const PORTFOLIO_PROFILES = {
       {
         id: "haultrack",
         title: "HaulTrack — Fleet Telematics Case Study",
-        role: "Coursework (SEPM)",
+        role: "College Practical (SEPM)",
         category: "web",
         badge: "Case Study",
-        description: "A software engineering case study designing a fleet telematics and driver-safety system for a hypothetical 1,800-truck logistics company, balancing the needs of managers, drivers, and insurers.",
+        description: "A Software Engineering & Project Management (SEPM) practical designing a fleet telematics and driver-safety system for a hypothetical 1,800-truck logistics company, balancing the needs of managers, drivers, and insurers.",
         highlights: [
           "Requirements and stakeholder analysis for three competing groups",
           "Interactive web demo hosted on GitHub Pages"
@@ -144,10 +144,10 @@ const PORTFOLIO_PROFILES = {
       {
         id: "ml-campaign",
         title: "Marketing Campaign Response Prediction",
-        role: "Coursework (ML)",
+        role: "College Practical (ML)",
         category: "ml",
         badge: "Machine Learning",
-        description: "A semester machine learning project predicting which customers respond to a marketing campaign, using the public Kaggle Customer Personality Analysis dataset.",
+        description: "A machine learning college practical predicting which customers respond to a marketing campaign, using the public Kaggle Customer Personality Analysis dataset.",
         highlights: [
           "Feature engineering and classification models with scikit-learn",
           "Threshold tuning to compare precision/recall trade-offs",
